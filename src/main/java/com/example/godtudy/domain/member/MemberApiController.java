@@ -32,8 +32,6 @@ public class MemberApiController {
         }
         memberService.joinMember(studentJoinForm);
         return new ResponseEntity<>("Join Success", HttpStatus.OK);
-
-
     }
 
 //    @PostMapping("/join/teacher")
