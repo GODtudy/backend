@@ -7,21 +7,24 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
+
 @Slf4j
 @Service
 @RequiredArgsConstructor
 public class MemberService {
 
+    //TODO 만약에 teacher, student, parents별로 회원가입을 나눠야한다면?!? service를 interface로 만들어 줄 필요가 있어보임
+    //TODO 그리고 지금 생각에는 JoinForm 이 상당부분 겹치게 될 것 같은데, 선생님, 학부모한테서만 추가정보 들고온다면 공통의 Form 하나와 각 정보 하나를 나눠도 되지 않을까?
     private final MemberRepository memberRepository;
 
     private final PasswordEncoder passwordEncoder;
 
     public Member joinMember(StudentJoinForm studentJoinForm) {
-        log.info(studentJoinForm.getPassword());
-        studentJoinForm.setPassword(passwordEncoder.encode(studentJoinForm.getPassword())); //TODO passwordencoder를 dto에서 처리해서 넘겨줘도 되는건가? 여기서 이렇게 해줘도 되는건가
-        log.info(studentJoinForm.getPassword());
-        Member newMember = studentJoinForm.toEntity(); // TODO toentity를 여기서 불러와야하나??
+        studentJoinForm.setPassword(passwordEncoder.encode(studentJoinForm.getPassword()));
+        Member newMember = studentJoinForm.toEntity();
 
         return memberRepository.save(newMember);
     }
+
 }

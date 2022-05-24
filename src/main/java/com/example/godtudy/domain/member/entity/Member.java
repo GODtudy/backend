@@ -7,7 +7,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
-import java.util.Date;
+import java.time.LocalDate;
+
 
 @Entity
 @Getter
@@ -20,17 +21,23 @@ public class Member extends BaseEntity {
     @GeneratedValue
     private Long id;
 
+    @Column(nullable = false)
     private String name;
 
+    @Column(nullable = false, unique = true)
     private String username;
 
+    @Column(nullable = false)
     private String password;
 
+    @Column(nullable = false)
     private String email;
 
+    @Column(nullable = false)
     private String nickname;
 
-    private Date birthday;
+    @Column(nullable = false)
+    private LocalDate birthday;
 
     private Boolean emailVerified;
 
@@ -41,6 +48,7 @@ public class Member extends BaseEntity {
     private String subject;
 
     @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
     private Role role;
 
 

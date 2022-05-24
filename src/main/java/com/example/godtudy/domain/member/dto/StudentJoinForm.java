@@ -3,17 +3,22 @@ package com.example.godtudy.domain.member.dto;
 import com.example.godtudy.global.validation.ValidationGroups;
 import com.example.godtudy.domain.member.entity.Member;
 import com.example.godtudy.domain.member.entity.Role;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
+
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Pattern;
-import java.util.Date;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 
 @Data
+@NoArgsConstructor
+@AllArgsConstructor
 @Builder
 public class StudentJoinForm {
-
 
     @NotBlank(message = "아이디는 필수 입력사항입니다.", groups = ValidationGroups.NotEmptyGroup.class)
     @Pattern(regexp = "[a-zA-Z0-9]{2,15}",
@@ -45,18 +50,30 @@ public class StudentJoinForm {
             , groups = ValidationGroups.PatternCheckGroup.class)
     private String nickname;
 
-    private Date birthday;
+    @NotBlank(message = "", groups = ValidationGroups.NotEmptyGroup.class)
+    @Pattern(regexp = "^[0-9|]{4}",
+            groups = ValidationGroups.PatternCheckGroup.class)
+    private String year;
+
+    private String month;
+
+    @NotBlank(message = "*", groups = ValidationGroups.NotEmptyGroup.class)
+    @Pattern(regexp = "^([1-9]|[12][0-9]|3[01]){1,2}",
+            groups = ValidationGroups.PatternCheckGroup.class)
+    private String day;
 
     private Role role;
 
     public Member toEntity(){
+        String birthday = year + "-" + month + "-" + day;
+        LocalDate date = LocalDate.parse(birthday, DateTimeFormatter.ISO_DATE);
         return Member.builder()
                 .username(username)
                 .password(password)
                 .name(name)
                 .email(email)
                 .nickname(nickname)
-                .birthday(birthday)
+                .birthday(date)
                 .role(Role.STUDENT)
                 .build();
     }

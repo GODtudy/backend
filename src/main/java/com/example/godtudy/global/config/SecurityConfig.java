@@ -13,17 +13,22 @@ import org.springframework.security.web.SecurityFilterChain;
 
 @Configuration
 @EnableWebSecurity
-//@ConditionalOnDefaultWebSecurity
-//@ConditionalOnWebApplication(type = ConditionalOnWebApplication.Type.SERVLET)
-public class SecurityConfig {
+@ConditionalOnDefaultWebSecurity
+@ConditionalOnWebApplication(type = ConditionalOnWebApplication.Type.SERVLET)
+public class SecurityConfig{
 
     @Bean
-//    @Order(SecurityProperties.BASIC_AUTH_ORDER)
+    @Order(SecurityProperties.BASIC_AUTH_ORDER)
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+        //Spring Security 5.3부터 extends WebSecurityConfigurerAdapter 를 권장히지 않고 Bean으로 등록받는걸 권장한다고함
+        //https://spring.io/blog/2022/02/21/spring-security-without-the-websecurityconfigureradapter 참고1
+        //https://honeywater97.tistory.com/264 참고2
         http
                 .authorizeRequests()
-                .mvcMatchers("/", "/api/member").permitAll()
+                .mvcMatchers("/", "/api/member/**").permitAll()
                 .anyRequest().authenticated();
+        http
+                .csrf().disable();
 
         return http.build();
     }

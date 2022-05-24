@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.validation.Valid;
 
 @RequiredArgsConstructor
-@RestController("/api/member")
+@RestController
 public class MemberApiController {
 
     private final MemberService memberService;
@@ -25,7 +25,7 @@ public class MemberApiController {
     }
 
     /*    학생 회원가입     */
-    @PostMapping("/join/student")
+    @PostMapping("/api/member/join/student")
     public ResponseEntity<?> joinMember(@Valid @RequestBody StudentJoinForm studentJoinForm, Errors errors) {
         if (errors.hasErrors()) {
             return new ResponseEntity<>(errors, HttpStatus.BAD_REQUEST);
