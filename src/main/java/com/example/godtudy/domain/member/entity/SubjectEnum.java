@@ -1,0 +1,24 @@
+package com.example.godtudy.domain.member.entity;
+
+public enum SubjectEnum {
+
+    KOREAN_LANGUAGE,
+    MATHEMATICS,
+    ENGLISH,
+    COMMON_SCIENCE,
+    COMMON_SOCIAL_STUDIES,
+    PHYSICS,
+    CHEMISTRY,
+    BIOLOGY,
+    EARTH_SCIENCE,
+    KOREAN_HISTORY,
+    WORLD_HISTORY,
+    KOREAN_GEOGRAPHY,
+    WORLD_GEOGRAPHY,
+    ECONOMICS,
+    SOCIETY_AND_CULTURE,
+    LIFE_AND_ETHICS,
+    ETHICS_AND_IDEOLOGY,
+    EAST_ASIAN_HISTORY,
+    POLITICS_AND_LAW
+}

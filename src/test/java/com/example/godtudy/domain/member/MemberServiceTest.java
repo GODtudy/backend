@@ -48,7 +48,7 @@ class MemberServiceTest {
     }
 
 
-    @DisplayName("학생 회원가입 - 정상")
+//    @DisplayName("학생 회원가입 - 정상")
     @Test
     public void joinStudent() throws Exception{
         //given

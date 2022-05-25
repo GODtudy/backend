@@ -11,7 +11,6 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
-
 @Entity
 @Getter
 @NoArgsConstructor
@@ -20,7 +19,7 @@ import java.util.List;
 public class Member extends BaseEntity {
 
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @Column(nullable = false)
@@ -48,10 +47,14 @@ public class Member extends BaseEntity {
     private String bio;
 
     @OneToMany(mappedBy = "member")
-    private List<MemberSubject> Subject = new ArrayList<>();
+    private List<Subject> subject = new ArrayList<>();
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private Role role;
+
+    public void addSubject(Subject subject) {
+        this.subject.add(subject);
+    }
 
 }

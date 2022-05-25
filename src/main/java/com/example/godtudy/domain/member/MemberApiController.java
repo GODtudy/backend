@@ -1,9 +1,11 @@
 package com.example.godtudy.domain.member;
 
 import com.example.godtudy.domain.member.dto.MemberJoinForm;
+import com.example.godtudy.domain.member.entity.Member;
 import com.example.godtudy.domain.member.entity.Role;
 import com.example.godtudy.domain.validator.StudentJoinFormValidator;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.Errors;
@@ -15,6 +17,7 @@ import javax.validation.Valid;
 @RequestMapping("/api/member")
 @RequiredArgsConstructor
 @RestController
+@Slf4j
 public class MemberApiController {
 
     private final MemberService memberService;
@@ -33,7 +36,10 @@ public class MemberApiController {
             return new ResponseEntity<>(errors, HttpStatus.BAD_REQUEST);
         }
         memberJoinForm.setRole(Role.STUDENT);
-        memberService.joinMember(memberJoinForm);
+        Member member = memberService.joinMember(memberJoinForm);
+
+        memberService.addSubject(member, memberJoinForm);
+
         return new ResponseEntity<>("Join Success", HttpStatus.OK);
     }
 

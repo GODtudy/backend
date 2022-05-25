@@ -2,10 +2,12 @@ package com.example.godtudy.domain.validator;
 
 import com.example.godtudy.domain.member.MemberRepository;
 import com.example.godtudy.domain.member.dto.MemberJoinForm;
+import com.example.godtudy.domain.member.entity.SubjectEnum;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import org.springframework.validation.Errors;
 import org.springframework.validation.Validator;
+import org.yaml.snakeyaml.util.EnumUtils;
 
 @Component
 @RequiredArgsConstructor

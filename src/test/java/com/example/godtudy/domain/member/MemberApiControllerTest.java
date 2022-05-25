@@ -49,7 +49,7 @@ class MemberApiControllerTest {
         memberRepository.deleteAll();
     }
 
-    @DisplayName("학생 회원가입 - 아이디 중복")
+//    @DisplayName("학생 회원가입 - 아이디 중복")
     @Test
     public void joinStudent_error_username() throws Exception{
         mockMvc.perform(post("/api/member/join/student")

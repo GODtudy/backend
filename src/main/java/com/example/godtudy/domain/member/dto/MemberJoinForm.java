@@ -1,5 +1,7 @@
 package com.example.godtudy.domain.member.dto;
 
+import com.example.godtudy.domain.member.entity.Subject;
+import com.example.godtudy.domain.member.entity.SubjectEnum;
 import com.example.godtudy.global.validation.ValidationGroups;
 import com.example.godtudy.domain.member.entity.Member;
 import com.example.godtudy.domain.member.entity.Role;
@@ -13,6 +15,7 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Pattern;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.List;
 
 @Data
 @NoArgsConstructor
@@ -50,7 +53,7 @@ public class MemberJoinForm {
             , groups = ValidationGroups.PatternCheckGroup.class)
     private String nickname;
 
-    @NotBlank(message = "", groups = ValidationGroups.NotEmptyGroup.class)
+    @NotBlank(message = "*", groups = ValidationGroups.NotEmptyGroup.class)
     @Pattern(regexp = "^[0-9|]{4}",
             groups = ValidationGroups.PatternCheckGroup.class)
     private String year;
@@ -63,6 +66,11 @@ public class MemberJoinForm {
     private String day;
 
     private Role role;
+
+    @NotBlank(message = "필수 입력사항 입니다.", groups = ValidationGroups.NotEmptyGroup.class)
+    private List<String> subject;
+
+
 
     public Member toEntity(){
         String birthday = year + "-" + month + "-" + day;
@@ -77,4 +85,5 @@ public class MemberJoinForm {
                 .role(role)
                 .build();
     }
+
 }
