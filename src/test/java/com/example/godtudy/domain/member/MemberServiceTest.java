@@ -1,23 +1,19 @@
 package com.example.godtudy.domain.member;
 
-import com.example.godtudy.domain.member.dto.StudentJoinForm;
+import com.example.godtudy.domain.member.dto.MemberJoinForm;
 import com.example.godtudy.domain.member.entity.Member;
-import org.aspectj.lang.annotation.After;
-import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityManager;
 
 import static org.assertj.core.api.Assertions.*;
-import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
 @Transactional
@@ -35,7 +31,7 @@ class MemberServiceTest {
 
     @BeforeEach
     void beforeEach(){
-        StudentJoinForm studentJoinForm = StudentJoinForm.builder()
+        MemberJoinForm memberJoinForm = MemberJoinForm.builder()
                 .username("swchoi1997")
                 .password("tkddnjs4371@")
                 .name("최상원")
@@ -43,7 +39,7 @@ class MemberServiceTest {
                 .nickname("숲속의냉면")
                 .year("1997").month("02").day("12")
                 .build();
-        memberService.joinMember(studentJoinForm);
+        memberService.joinMember(memberJoinForm);
     }
 
     @AfterEach
@@ -56,7 +52,7 @@ class MemberServiceTest {
     @Test
     public void joinStudent() throws Exception{
         //given
-        StudentJoinForm newMember = StudentJoinForm.builder()
+        MemberJoinForm newMember = MemberJoinForm.builder()
                 .username("test1")
                 .password("tkddnjs4371@")
                 .name("최상원")
@@ -76,26 +72,6 @@ class MemberServiceTest {
         assertThat(member.getEmail()).isEqualTo(newMember.getEmail());
         assertThat(member.getNickname()).isEqualTo(newMember.getNickname());
         assertThat(passwordEncoder.matches(member.getPassword(), newMember.getPassword()));
-    }
-
-    @DisplayName("학생 회원가입 - 아이디 중복")
-    @Test
-    public void joinStudent_error_username() throws Exception{
-        //given
-        StudentJoinForm newMember = StudentJoinForm.builder()
-                .username("swchoi1997")
-                .password("tkddnjs4371@")
-                .name("최상원")
-                .email("test1@naver.com")
-                .nickname("test1")
-                .year("1997").month("02").day("12")
-                .build();
-        //when
-        memberService.joinMember(newMember);
-
-        //then
-
-
     }
 
 }

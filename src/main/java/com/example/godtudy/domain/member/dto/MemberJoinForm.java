@@ -18,7 +18,7 @@ import java.time.format.DateTimeFormatter;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class StudentJoinForm {
+public class MemberJoinForm {
 
     @NotBlank(message = "아이디는 필수 입력사항입니다.", groups = ValidationGroups.NotEmptyGroup.class)
     @Pattern(regexp = "[a-zA-Z0-9]{2,15}",
@@ -74,7 +74,7 @@ public class StudentJoinForm {
                 .email(email)
                 .nickname(nickname)
                 .birthday(date)
-                .role(Role.STUDENT)
+                .role(role)
                 .build();
     }
 }

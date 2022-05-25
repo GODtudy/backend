@@ -8,6 +8,8 @@ import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 
 
 @Entity
@@ -45,11 +47,12 @@ public class Member extends BaseEntity {
 
     private String bio;
 
-    private String subject;
+    @OneToMany(mappedBy = "member")
+    @JoinColumn(name = "subject_id")
+    private List<Subject> subjects = new ArrayList<>();
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private Role role;
-
 
 }

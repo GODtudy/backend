@@ -1,6 +1,7 @@
 package com.example.godtudy.domain.member;
 
-import com.example.godtudy.domain.member.dto.StudentJoinForm;
+import com.example.godtudy.domain.member.dto.MemberJoinForm;
+import com.example.godtudy.domain.member.entity.Role;
 import com.example.godtudy.domain.validator.StudentJoinFormValidator;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -11,6 +12,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 
+@RequestMapping("/api/member")
 @RequiredArgsConstructor
 @RestController
 public class MemberApiController {
@@ -25,17 +27,25 @@ public class MemberApiController {
     }
 
     /*    학생 회원가입     */
-    @PostMapping("/api/member/join/student")
-    public ResponseEntity<?> joinMember(@Valid @RequestBody StudentJoinForm studentJoinForm, Errors errors) {
+    @PostMapping("/join/student")
+    public ResponseEntity<?> joinMemberStudent(@Valid @RequestBody MemberJoinForm memberJoinForm, Errors errors) {
         if (errors.hasErrors()) {
             return new ResponseEntity<>(errors, HttpStatus.BAD_REQUEST);
         }
-        memberService.joinMember(studentJoinForm);
+        memberJoinForm.setRole(Role.STUDENT);
+        memberService.joinMember(memberJoinForm);
         return new ResponseEntity<>("Join Success", HttpStatus.OK);
     }
 
-//    @PostMapping("/join/teacher")
-//    public ResponseEntity<?> joinMember(@Valid @RequestBody StudentJoinForm studentJoinForm) {
-//
-//    }
+    /*    선생님 회원가입     */
+    @PostMapping("/join/teacher")
+    public ResponseEntity<?> joinMemberTeacher(@Valid @RequestBody MemberJoinForm memberJoinForm, Errors errors) {
+        if (errors.hasErrors()) {
+            return new ResponseEntity<>(errors, HttpStatus.BAD_REQUEST);
+        }
+        memberJoinForm.setRole(Role.TEACHER);
+        memberService.joinMember(memberJoinForm);
+        return new ResponseEntity<>("Join Success", HttpStatus.OK);
+    }
+
 }
