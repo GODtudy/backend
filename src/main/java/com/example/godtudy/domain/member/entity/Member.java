@@ -48,8 +48,7 @@ public class Member extends BaseEntity {
     private String bio;
 
     @OneToMany(mappedBy = "member")
-    @JoinColumn(name = "subject_id")
-    private List<Subject> subjects = new ArrayList<>();
+    private List<MemberSubject> Subject = new ArrayList<>();
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
