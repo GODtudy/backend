@@ -1,4 +1,4 @@
-package com.example.godtudy.domain.member;
+package com.example.godtudy.domain.member.repository;
 
 import com.example.godtudy.domain.member.entity.Subject;
 import org.springframework.data.jpa.repository.JpaRepository;

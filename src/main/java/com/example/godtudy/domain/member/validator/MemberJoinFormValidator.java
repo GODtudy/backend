@@ -1,17 +1,15 @@
-package com.example.godtudy.domain.validator;
+package com.example.godtudy.domain.member.validator;
 
-import com.example.godtudy.domain.member.MemberRepository;
+import com.example.godtudy.domain.member.repository.MemberRepository;
 import com.example.godtudy.domain.member.dto.MemberJoinForm;
-import com.example.godtudy.domain.member.entity.SubjectEnum;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import org.springframework.validation.Errors;
 import org.springframework.validation.Validator;
-import org.yaml.snakeyaml.util.EnumUtils;
 
 @Component
 @RequiredArgsConstructor
-public class StudentJoinFormValidator implements Validator {
+public class MemberJoinFormValidator implements Validator {
 
     private final MemberRepository memberRepository;
 

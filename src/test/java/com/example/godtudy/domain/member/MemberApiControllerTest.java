@@ -1,9 +1,10 @@
 package com.example.godtudy.domain.member;
 
 import com.example.godtudy.domain.member.dto.MemberJoinForm;
+import com.example.godtudy.domain.member.repository.MemberRepository;
+import com.example.godtudy.domain.member.service.MemberService;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
