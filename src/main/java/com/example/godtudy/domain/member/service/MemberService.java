@@ -18,7 +18,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.yaml.snakeyaml.util.EnumUtils;
 
 
 @Slf4j
@@ -47,6 +46,7 @@ public class MemberService {
 
     /*  회원가입  */
     public Member joinMember(MemberJoinForm memberJoinForm, String role) {
+
         memberJoinForm.setPassword(passwordEncoder.encode(memberJoinForm.getPassword()));
         memberJoinForm.setRole(Role.valueOf(role.toUpperCase()));
         Member newMember = memberJoinForm.toEntity();
@@ -54,17 +54,12 @@ public class MemberService {
         return memberRepository.save(newMember);
     }
 
-    private void checkSubject(String title){
-        EnumUtils.findEnumInsensitiveCase(SubjectEnum.class, title);
-    }
-
     /*   과목 명 받아서 저장   */
     public void addSubject(Member member, MemberJoinForm memberJoinForm) {
         if (memberJoinForm.getSubject().isEmpty()) {
             throw new IllegalArgumentException("입력하지 않은 부분이 있습니다. 확인해 주세요.");
         }
-        for (String title: memberJoinForm.getSubject()) {
-            checkSubject(title);
+        for (SubjectEnum title: memberJoinForm.getSubject()) {
             Subject subject = Subject.builder().title(title).member(member).build();
             subjectRepository.save(subject);
         }

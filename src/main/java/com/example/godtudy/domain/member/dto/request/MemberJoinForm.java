@@ -68,7 +68,7 @@ public class MemberJoinForm {
     private Role role;
 
     @NotBlank(message = "필수 입력사항 입니다.", groups = ValidationGroups.NotEmptyGroup.class)
-    private List<String> subject;
+    private List<SubjectEnum> subject;
 
 
 

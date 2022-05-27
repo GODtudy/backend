@@ -44,7 +44,7 @@ public class MemberApiController {
 
     /*     회원가입     */
     @PostMapping("/join/{role}")
-    public ResponseEntity<?> joinMemberStudent(@Valid @RequestBody MemberJoinForm memberJoinForm, @PathVariable String role, Errors errors) {
+    public ResponseEntity<?> joinMember(@Valid @RequestBody MemberJoinForm memberJoinForm, @PathVariable String role, Errors errors) {
         if (errors.hasErrors()) {
             return new ResponseEntity<>(errors.getAllErrors(), HttpStatus.BAD_REQUEST);
         }
@@ -54,7 +54,6 @@ public class MemberApiController {
 
         return new ResponseEntity<>("Join Success", HttpStatus.OK);
     }
-
 
     /*     아이디 중복 확인     */
     @PostMapping("/join/student/username")
