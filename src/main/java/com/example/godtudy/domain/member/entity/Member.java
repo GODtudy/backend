@@ -40,6 +40,8 @@ public class Member extends BaseEntity {
 
     private Boolean emailVerified;
 
+    private String emailCheckToken; // 이메일 인증 토큰
+
     private String profileImageUrl;
 
     private String bio;
