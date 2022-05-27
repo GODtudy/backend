@@ -1,0 +1,75 @@
+package com.example.godtudy.domain;
+
+import com.example.godtudy.domain.member.entity.Member;
+import com.example.godtudy.domain.member.entity.Role;
+import com.example.godtudy.domain.member.entity.Subject;
+import com.example.godtudy.domain.member.entity.SubjectEnum;
+import com.example.godtudy.domain.member.repository.MemberRepository;
+import com.example.godtudy.domain.member.repository.SubjectRepository;
+import lombok.RequiredArgsConstructor;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
+
+import javax.annotation.PostConstruct;
+import java.time.LocalDate;
+import java.util.Random;
+import java.util.stream.IntStream;
+
+@Component
+@RequiredArgsConstructor
+public class InitDb {
+
+    private final MemberInitService memberInitService;
+
+    @PostConstruct
+    public void init() {
+        memberInitService.insertMember();
+        memberInitService.insertSubject();
+    }
+
+    @Component
+    @Transactional
+    @RequiredArgsConstructor
+    static class MemberInitService {
+        private final MemberRepository memberRepository;
+        private final SubjectRepository subjectRepository;
+        private final PasswordEncoder passwordEncoder;
+        Random random = new Random();
+
+        public void insertMember() {
+            IntStream.rangeClosed(1,100).forEach(i -> {
+                Member member = Member.builder()
+                        .name("name" + i)
+                        .username("test" + i)
+                        .password(passwordEncoder.encode("test" + i))
+                        .email("test" + i + "@gmail.com")
+                        .nickname("nickname" + i)
+                        .birthday(LocalDate.of(1960 + random.nextInt(60),
+                                1 + random.nextInt(12),
+                                1 + random.nextInt(28)))
+                        .role(Role.values()[random.nextInt(Role.values().length)])
+                        .build();
+
+                memberRepository.save(member);
+            });
+        }
+
+        public void insertSubject() {
+            IntStream.rangeClosed(1,100).forEach(i -> {
+                Member member = Member.builder()
+                        .id((long)(1 + random.nextInt(100)))
+                        .build();
+
+                Subject subject = Subject.builder()
+                        .title(SubjectEnum.values()[random.nextInt(SubjectEnum.values().length)])
+                        .member(member)
+                        .build();
+
+                subjectRepository.save(subject);
+            });
+        }
+    }
+
+
+}
