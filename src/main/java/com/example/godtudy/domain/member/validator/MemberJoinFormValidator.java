@@ -1,7 +1,7 @@
 package com.example.godtudy.domain.member.validator;
 
 import com.example.godtudy.domain.member.repository.MemberRepository;
-import com.example.godtudy.domain.member.dto.MemberJoinForm;
+import com.example.godtudy.domain.member.dto.request.MemberJoinForm;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import org.springframework.validation.Errors;

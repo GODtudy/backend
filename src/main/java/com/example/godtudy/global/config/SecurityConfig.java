@@ -1,6 +1,11 @@
 package com.example.godtudy.global.config;
 
 
+import com.example.godtudy.global.config.security.AccessDeniedHandler.CustomAccessDeniedHandler;
+import com.example.godtudy.global.config.security.AuthenticationEntryPoint.CustomAuthenticationEntryPoint;
+import com.example.godtudy.global.config.security.jwt.JwtAuthenticationFilter;
+import com.example.godtudy.global.config.security.jwt.JwtTokenProvider;
+import lombok.RequiredArgsConstructor;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnWebApplication;
 import org.springframework.boot.autoconfigure.security.ConditionalOnDefaultWebSecurity;
 import org.springframework.boot.autoconfigure.security.SecurityProperties;
@@ -10,13 +15,18 @@ import org.springframework.core.annotation.Order;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 @Configuration
 @EnableWebSecurity
+@RequiredArgsConstructor
 @ConditionalOnDefaultWebSecurity
 @ConditionalOnWebApplication(type = ConditionalOnWebApplication.Type.SERVLET)
 public class SecurityConfig{
+
+    private final JwtTokenProvider jwtTokenProvider;
 
     @Bean
     public WebSecurityCustomizer webSecurityCustomizer() {
@@ -32,11 +42,20 @@ public class SecurityConfig{
         //https://spring.io/blog/2022/02/21/spring-security-without-the-websecurityconfigureradapter 참고1
         //https://honeywater97.tistory.com/264 참고2
         http
+                .httpBasic().disable()
+                .csrf().disable()
+                .formLogin().disable()
+                .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+            .and()
                 .authorizeRequests()
                 .mvcMatchers("/", "/api/member/**").permitAll()
-                .anyRequest().authenticated();
-        http
-                .csrf().disable();
+                .anyRequest().authenticated()
+            .and()
+                .exceptionHandling().authenticationEntryPoint(new CustomAuthenticationEntryPoint())//401
+            .and()
+                .exceptionHandling().accessDeniedHandler(new CustomAccessDeniedHandler())//403
+            .and()
+                .addFilterBefore(new JwtAuthenticationFilter(jwtTokenProvider), UsernamePasswordAuthenticationFilter.class); //jwt필터
 
         return http.build();
     }

@@ -1,15 +1,18 @@
 package com.example.godtudy.domain.member.service;
 
+import com.example.godtudy.domain.member.dto.request.*;
+import com.example.godtudy.domain.member.dto.response.MemberLoginResponseDto;
+import com.example.godtudy.domain.member.entity.Role;
 import com.example.godtudy.domain.member.repository.MemberRepository;
 import com.example.godtudy.domain.member.repository.SubjectRepository;
-import com.example.godtudy.domain.member.dto.EmailRequestDto;
-import com.example.godtudy.domain.member.dto.MemberJoinForm;
-import com.example.godtudy.domain.member.dto.NicknameRequestDto;
-import com.example.godtudy.domain.member.dto.UsernameRequestDto;
 import com.example.godtudy.domain.member.entity.Member;
 import com.example.godtudy.domain.member.entity.Subject;
 import com.example.godtudy.domain.member.entity.SubjectEnum;
+import com.example.godtudy.global.advice.exception.LoginFailureException;
+import com.example.godtudy.global.advice.exception.MemberEmailAlreadyExistsException;
+import com.example.godtudy.global.advice.exception.MemberNicknameAlreadyExistsException;
 import com.example.godtudy.global.advice.exception.MemberUsernameAlreadyExistsException;
+import com.example.godtudy.global.config.security.jwt.JwtTokenProvider;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -27,10 +30,25 @@ public class MemberService {
     private final MemberRepository memberRepository;
     private final SubjectRepository subjectRepository;
 
+    private final JwtTokenProvider jwtTokenProvider;
     private final PasswordEncoder passwordEncoder;
 
-    public Member joinMember(MemberJoinForm memberJoinForm) {
+    /*  로그인  */
+    public MemberLoginResponseDto loginMember(MemberLoginRequestDto memberLoginRequestDto) {
+        Member member = memberRepository.findByUsername(memberLoginRequestDto.getUsername())
+                .orElseThrow(LoginFailureException::new);
+
+        if (!passwordEncoder.matches(memberLoginRequestDto.getPassword(), member.getPassword())) {
+            throw new LoginFailureException();
+        }
+
+        return new MemberLoginResponseDto(member.getId(), jwtTokenProvider.createToken(memberLoginRequestDto.getUsername()));
+    }
+
+    /*  회원가입  */
+    public Member joinMember(MemberJoinForm memberJoinForm, String role) {
         memberJoinForm.setPassword(passwordEncoder.encode(memberJoinForm.getPassword()));
+        memberJoinForm.setRole(Role.valueOf(role.toUpperCase()));
         Member newMember = memberJoinForm.toEntity();
 
         return memberRepository.save(newMember);
@@ -51,14 +69,8 @@ public class MemberService {
             subjectRepository.save(subject);
         }
     }
-    @Transactional(readOnly = true)
-    public void emailCheckDuplication(EmailRequestDto emailRequestDto) {
-        memberRepository.findByEmail(emailRequestDto.getEmail())
-                .ifPresent(e -> {
-                    throw new IllegalArgumentException("이미 인증된 이메일 입니다.");
-                });
-    }
 
+    //아이디 중복확인
     @Transactional(readOnly = true)
     public void usernameCheckDuplication(UsernameRequestDto usernameRequestDto) {
         memberRepository.findByUsername(usernameRequestDto.getUsername())
@@ -66,11 +78,21 @@ public class MemberService {
                     throw new MemberUsernameAlreadyExistsException("이미 사용중인 아이디 입니다.");
                 });
     }
+    // 인증된 이메일 Or 이메일 중복확인
+    @Transactional(readOnly = true)
+    public void emailCheckDuplication(EmailRequestDto emailRequestDto) {
+        memberRepository.findByEmail(emailRequestDto.getEmail())
+                .ifPresent(e -> {
+                    throw new MemberEmailAlreadyExistsException("이미 인증된 이메일 입니다.");
+                });
+    }
 
+    //닉네임 중복확인
+    @Transactional(readOnly = true)
     public void nicknameCheckDuplication(NicknameRequestDto nicknameRequestDto) {
         memberRepository.findByNickname(nicknameRequestDto.getNickname())
                 .ifPresent(e -> {
-                    throw new IllegalArgumentException("이미 사용중인 닉네임 입니다.");
+                    throw new MemberNicknameAlreadyExistsException("이미 사용중인 닉네임 입니다.");
                 });
     }
 }

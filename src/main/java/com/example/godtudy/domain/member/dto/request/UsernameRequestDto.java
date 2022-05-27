@@ -1,4 +1,4 @@
-package com.example.godtudy.domain.member.dto;
+package com.example.godtudy.domain.member.dto.request;
 
 import com.example.godtudy.global.validation.ValidationGroups;
 import lombok.Data;

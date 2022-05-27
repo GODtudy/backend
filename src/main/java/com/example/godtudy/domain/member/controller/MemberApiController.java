@@ -1,10 +1,8 @@
 package com.example.godtudy.domain.member.controller;
 
+import com.example.godtudy.domain.member.dto.request.*;
+import com.example.godtudy.domain.member.dto.response.MemberLoginResponseDto;
 import com.example.godtudy.domain.member.service.MemberService;
-import com.example.godtudy.domain.member.dto.EmailRequestDto;
-import com.example.godtudy.domain.member.dto.MemberJoinForm;
-import com.example.godtudy.domain.member.dto.NicknameRequestDto;
-import com.example.godtudy.domain.member.dto.UsernameRequestDto;
 import com.example.godtudy.domain.member.entity.Member;
 import com.example.godtudy.domain.member.entity.Role;
 import com.example.godtudy.domain.member.validator.MemberJoinFormValidator;
@@ -36,14 +34,22 @@ public class MemberApiController {
         webDataBinder.addValidators(memberJoinFormValidator);
     }
 
+    /*     로그인     */
+    @PostMapping("/login")
+    public ResponseEntity<MemberLoginResponseDto> login(@RequestBody MemberLoginRequestDto memberLoginRequestDto) {
+        MemberLoginResponseDto memberLoginResponseDto = memberService.loginMember(memberLoginRequestDto);
+
+        return new ResponseEntity<>(memberLoginResponseDto, HttpStatus.OK);
+    }
+
     /*     회원가입     */
-    @PostMapping("/join/student")
-    public ResponseEntity<?> joinMemberStudent(@Valid @RequestBody MemberJoinForm memberJoinForm, Errors errors) {
+    @PostMapping("/join/{role}")
+    public ResponseEntity<?> joinMemberStudent(@Valid @RequestBody MemberJoinForm memberJoinForm, @PathVariable String role, Errors errors) {
         if (errors.hasErrors()) {
             return new ResponseEntity<>(errors.getAllErrors(), HttpStatus.BAD_REQUEST);
         }
         memberJoinForm.setRole(Role.STUDENT);
-        Member member = memberService.joinMember(memberJoinForm);
+        Member member = memberService.joinMember(memberJoinForm, role);
         memberService.addSubject(member, memberJoinForm);
 
         return new ResponseEntity<>("Join Success", HttpStatus.OK);

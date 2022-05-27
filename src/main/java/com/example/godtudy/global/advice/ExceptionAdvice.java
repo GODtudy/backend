@@ -25,6 +25,12 @@ public class ExceptionAdvice {
         return ExceptionResponse.getFailureResult(400, "이미 존재하는 아이디 입니다.");
     }
 
+    @ExceptionHandler(MemberNicknameAlreadyExistsException.class)
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    public ExceptionResponse memberNicknameAlreadyExistsException(){
+        return ExceptionResponse.getFailureResult(400, "이미 존재하는 닉네임 입니다.");
+    }
+
     @ExceptionHandler(LoginFailureException.class)
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     public ExceptionResponse loginFailureException() {

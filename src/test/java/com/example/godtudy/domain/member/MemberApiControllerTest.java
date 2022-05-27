@@ -1,6 +1,6 @@
 package com.example.godtudy.domain.member;
 
-import com.example.godtudy.domain.member.dto.MemberJoinForm;
+import com.example.godtudy.domain.member.dto.request.MemberJoinForm;
 import com.example.godtudy.domain.member.repository.MemberRepository;
 import com.example.godtudy.domain.member.service.MemberService;
 import org.junit.jupiter.api.AfterEach;
