@@ -1,4 +1,4 @@
-package com.example.godtudy.global.config.security.member;
+package com.example.godtudy.global.security.member;
 
 import lombok.Builder;
 import org.springframework.security.core.GrantedAuthority;
@@ -9,12 +9,14 @@ import java.util.List;
 
 public class MemberDetails implements UserDetails {
 
+    private Long id;
     private String username;
     private String password;
     List<GrantedAuthority> authorities;
 
     @Builder
-    public MemberDetails(String username, String password, List<GrantedAuthority> authorities) {
+    public MemberDetails(Long id, String username, String password, List<GrantedAuthority> authorities) {
+        this.id = id;
         this.username = username;
         this.password = password;
         this.authorities = authorities;
@@ -57,5 +59,9 @@ public class MemberDetails implements UserDetails {
     @Override
     public boolean isEnabled() {
         return true;
+    }
+
+    public Long getId() {
+        return id;
     }
 }

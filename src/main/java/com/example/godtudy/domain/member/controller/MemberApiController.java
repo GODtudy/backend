@@ -34,12 +34,27 @@ public class MemberApiController {
         webDataBinder.addValidators(memberJoinFormValidator);
     }
 
-    /*     로그인     */
-    @PostMapping("/login")
-    public ResponseEntity<MemberLoginResponseDto> login(@RequestBody MemberLoginRequestDto memberLoginRequestDto) {
-        MemberLoginResponseDto memberLoginResponseDto = memberService.loginMember(memberLoginRequestDto);
+//    /*     로그인     */
+//    @PostMapping("/login")
+//    public ResponseEntity<MemberLoginResponseDto> login(@RequestBody MemberLoginRequestDto memberLoginRequestDto) {
+//        MemberLoginResponseDto memberLoginResponseDto = memberService.loginMember(memberLoginRequestDto);
+//
+//        return new ResponseEntity<>(memberLoginResponseDto, HttpStatus.OK);
+//    }
 
-        return new ResponseEntity<>(memberLoginResponseDto, HttpStatus.OK);
+    @PostMapping("/login")
+    public ResponseEntity<?> createAuthenticationToken_login(@RequestBody MemberLoginRequestDto memberLoginRequestDto) {
+        return memberService.createAuthenticationToken(memberLoginRequestDto);
+    }
+
+    @PostMapping("/auth/token")
+    public ResponseEntity<?> reissueAuthenticationToken(@RequestBody TokenRequestDto tokenRequestDto) {
+        return memberService.reissueAuthenticationToken(tokenRequestDto);
+    }
+
+    @PostMapping("/logout")
+    public void deleteAuthenticationToken(@RequestBody MemberLogoutRequestDto memberLogoutRequestDto) {
+        memberService.deleteAuthenticationToken(memberLogoutRequestDto);
     }
 
     /*     회원가입     */
@@ -86,11 +101,11 @@ public class MemberApiController {
     }
 
 //    {
-//        "username": "swchoi19971",
+//        "username": "test1",
 //            "password": "tkddnjs8528##",
-//            "name" : "최상원",
-//            "email" : "swc1hoi19197@nvaer.com",
-//            "nickname": "test11",
+//            "name" : "test1",
+//            "email" : "test1@nvaer.com",
+//            "nickname": "test1",
 //            "year": "1997",
 //            "month": "02",
 //            "day": "12",

@@ -2,10 +2,12 @@ package com.example.godtudy.domain.member;
 
 import com.example.godtudy.domain.member.dto.request.MemberJoinForm;
 import com.example.godtudy.domain.member.entity.Member;
+import com.example.godtudy.domain.member.entity.Role;
 import com.example.godtudy.domain.member.repository.MemberRepository;
 import com.example.godtudy.domain.member.service.MemberService;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -40,7 +42,7 @@ class MemberServiceTest {
                 .nickname("숲속의냉면")
                 .year("1997").month("02").day("12")
                 .build();
-        memberService.joinMember(memberJoinForm);
+        memberService.joinMember(memberJoinForm, "student");
     }
 
     @AfterEach
@@ -49,20 +51,20 @@ class MemberServiceTest {
     }
 
 
-//    @DisplayName("학생 회원가입 - 정상")
+    @DisplayName("학생 회원가입 - 정상")
     @Test
     public void joinStudent() throws Exception{
         //given
         MemberJoinForm newMember = MemberJoinForm.builder()
-                .username("test1")
+                .username("test40")
                 .password("tkddnjs4371@")
                 .name("최상원")
-                .email("test1@naver.com")
-                .nickname("test1")
+                .email("test40@naver.com")
+                .nickname("test40")
                 .year("1997").month("02").day("12")
                 .build();
         //when
-        memberService.joinMember(newMember);
+        memberService.joinMember(newMember, "student");
 
         //then
         Member member = memberRepository.findByUsername(newMember.getUsername()).orElseThrow(() -> new Exception("유저가 없습니다."));

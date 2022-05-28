@@ -1,4 +1,4 @@
-package com.example.godtudy.global.config.security.AuthenticationEntryPoint;
+package com.example.godtudy.global.security.AuthenticationEntryPoint;
 
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.AuthenticationEntryPoint;
@@ -12,6 +12,6 @@ import java.io.IOException;
 public class CustomAuthenticationEntryPoint implements AuthenticationEntryPoint {
     @Override
     public void commence(HttpServletRequest request, HttpServletResponse response, AuthenticationException authException) throws IOException, ServletException {
-        response.sendRedirect("/member/login");
+        response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Unauthorized");
     }
 }

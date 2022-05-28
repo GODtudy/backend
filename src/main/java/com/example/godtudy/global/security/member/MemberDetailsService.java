@@ -1,4 +1,4 @@
-package com.example.godtudy.global.config.security.member;
+package com.example.godtudy.global.security.member;
 
 import com.example.godtudy.domain.member.entity.Member;
 import com.example.godtudy.domain.member.repository.MemberRepository;

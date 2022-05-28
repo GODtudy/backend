@@ -1,20 +1,24 @@
 package com.example.godtudy.domain.member.service;
 
 import com.example.godtudy.domain.member.dto.request.*;
+import com.example.godtudy.domain.member.dto.response.JwtTokenResponseDto;
 import com.example.godtudy.domain.member.dto.response.MemberLoginResponseDto;
-import com.example.godtudy.domain.member.entity.Role;
+import com.example.godtudy.domain.member.entity.*;
+import com.example.godtudy.domain.member.repository.JwtRefreshTokenRepository;
 import com.example.godtudy.domain.member.repository.MemberRepository;
 import com.example.godtudy.domain.member.repository.SubjectRepository;
-import com.example.godtudy.domain.member.entity.Member;
-import com.example.godtudy.domain.member.entity.Subject;
-import com.example.godtudy.domain.member.entity.SubjectEnum;
-import com.example.godtudy.global.advice.exception.LoginFailureException;
 import com.example.godtudy.global.advice.exception.MemberEmailAlreadyExistsException;
 import com.example.godtudy.global.advice.exception.MemberNicknameAlreadyExistsException;
 import com.example.godtudy.global.advice.exception.MemberUsernameAlreadyExistsException;
-import com.example.godtudy.global.config.security.jwt.JwtTokenProvider;
+import com.example.godtudy.global.security.jwt.JwtTokenProvider;
+import com.example.godtudy.global.security.member.MemberDetails;
+import com.example.godtudy.global.security.member.MemberDetailsService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -28,21 +32,71 @@ public class MemberService {
 
     private final MemberRepository memberRepository;
     private final SubjectRepository subjectRepository;
+    private final JwtRefreshTokenRepository jwtRefreshTokenRepository;
 
+    private final AuthenticationManager authenticationManager;
     private final JwtTokenProvider jwtTokenProvider;
+    private final MemberDetailsService memberDetailsService;
     private final PasswordEncoder passwordEncoder;
 
-    /*  로그인  */
-    public MemberLoginResponseDto loginMember(MemberLoginRequestDto memberLoginRequestDto) {
-        Member member = memberRepository.findByUsername(memberLoginRequestDto.getUsername())
-                .orElseThrow(LoginFailureException::new);
+//    /*  로그인  */
+//    public MemberLoginResponseDto loginMember(MemberLoginRequestDto memberLoginRequestDto) {
+//        Member member = memberRepository.findByUsername(memberLoginRequestDto.getUsername())
+//                .orElseThrow(LoginFailureException::new);
+//
+//        if (!passwordEncoder.matches(memberLoginRequestDto.getPassword(), member.getPassword())) {
+//            throw new LoginFailureException();
+//        }
+//
+//        return new MemberLoginResponseDto(member.getId(), jwtTokenProvider.createAccessToken(memberLoginRequestDto.getUsername()));
+//    }
 
-        if (!passwordEncoder.matches(memberLoginRequestDto.getPassword(), member.getPassword())) {
-            throw new LoginFailureException();
+
+    public ResponseEntity<?> createAuthenticationToken(MemberLoginRequestDto memberLoginRequestDto) {
+        Authentication authentication = authenticationManager.authenticate(
+                new UsernamePasswordAuthenticationToken(memberLoginRequestDto.getUsername(), memberLoginRequestDto.getPassword()));
+
+        final String accessToken = jwtTokenProvider.createAccessToken(memberLoginRequestDto.getUsername());
+        final String refreshToken = jwtTokenProvider.createRefreshToken();
+
+        // 데이터베이스에 Refresh Token 저장
+        jwtRefreshTokenRepository.save(new JwtRefreshToken(memberLoginRequestDto.getUsername(), refreshToken));
+
+        final MemberDetails memberDetails = (MemberDetails) memberDetailsService.loadUserByUsername(memberLoginRequestDto.getUsername());
+
+        return ResponseEntity.ok(new MemberLoginResponseDto(memberDetails.getId(), memberLoginRequestDto.getUsername(), accessToken, refreshToken));
+    }
+
+    public ResponseEntity<?> reissueAuthenticationToken(TokenRequestDto tokenRequestDto) {
+        // 사용자로부터 받은 Refresh Token 유효성 검사
+        // Refresh Token 마저 만료되면 다시 로그인
+        if (jwtTokenProvider.isTokenExpired(tokenRequestDto.getRefreshToken())
+                || !jwtTokenProvider.validateToken(tokenRequestDto.getRefreshToken())) {
+            throw new IllegalArgumentException("잘못된 요청입니다. 다시 로그인해주세요.");
         }
 
-        return new MemberLoginResponseDto(member.getId(), jwtTokenProvider.createToken(memberLoginRequestDto.getUsername()));
+        // Access Token 에 기술된 사용자 이름 가져오기
+        String username = jwtTokenProvider.getUsernameFromToken(tokenRequestDto.getAccessToken());
+
+        // 데이터베이스에 저장된 Refresh Token 과 비교
+        JwtRefreshToken jwtRefreshToken = jwtRefreshTokenRepository.findById(username).orElseThrow(
+                () -> new IllegalArgumentException("잘못된 요청입니다. 다시 로그인해주세요.")
+        );
+        if (!jwtRefreshToken.getRefreshToken().equals(tokenRequestDto.getRefreshToken())) {
+            throw new IllegalArgumentException("Refresh Token 정보가 일치하지 않습니다.");
+        }
+
+        // 새로운 Access Token 발급
+        final String accessToken = jwtTokenProvider.createAccessToken(username);
+
+        return ResponseEntity.ok(new JwtTokenResponseDto(accessToken));
     }
+
+    public void deleteAuthenticationToken(MemberLogoutRequestDto memberLogoutRequestDto) {
+        jwtRefreshTokenRepository.deleteById(memberLogoutRequestDto.getUsername());
+    }
+
+
 
     /*  회원가입  */
     public Member joinMember(MemberJoinForm memberJoinForm, String role) {

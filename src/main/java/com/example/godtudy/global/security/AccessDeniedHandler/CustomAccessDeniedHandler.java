@@ -1,4 +1,4 @@
-package com.example.godtudy.global.config.security.AccessDeniedHandler;
+package com.example.godtudy.global.security.AccessDeniedHandler;
 
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.web.access.AccessDeniedHandler;
