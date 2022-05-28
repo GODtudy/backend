@@ -21,6 +21,7 @@ import java.util.stream.IntStream;
 public class InitDb {
 
     private final MemberInitService memberInitService;
+    private static final int COUNT = 30;
 
     @PostConstruct
     public void init() {
@@ -38,7 +39,7 @@ public class InitDb {
         Random random = new Random();
 
         public void insertMember() {
-            IntStream.rangeClosed(1,100).forEach(i -> {
+            IntStream.rangeClosed(1,COUNT).forEach(i -> {
                 Member member = Member.builder()
                         .name("name" + i)
                         .username("test" + i)
@@ -56,9 +57,9 @@ public class InitDb {
         }
 
         public void insertSubject() {
-            IntStream.rangeClosed(1,100).forEach(i -> {
+            IntStream.rangeClosed(1,COUNT).forEach(i -> {
                 Member member = Member.builder()
-                        .id((long)(1 + random.nextInt(100)))
+                        .id((long)(1 + random.nextInt(COUNT)))
                         .build();
 
                 Subject subject = Subject.builder()
