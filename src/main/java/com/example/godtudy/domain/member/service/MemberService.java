@@ -16,6 +16,8 @@ import com.example.godtudy.global.security.member.MemberDetailsService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
+import org.springframework.mail.SimpleMailMessage;
+import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -34,22 +36,13 @@ public class MemberService {
     private final SubjectRepository subjectRepository;
     private final JwtRefreshTokenRepository jwtRefreshTokenRepository;
 
+    private final JavaMailSender javaMailSender;
+
     private final AuthenticationManager authenticationManager;
     private final JwtTokenProvider jwtTokenProvider;
     private final MemberDetailsService memberDetailsService;
     private final PasswordEncoder passwordEncoder;
 
-//    /*  로그인  */
-//    public MemberLoginResponseDto loginMember(MemberLoginRequestDto memberLoginRequestDto) {
-//        Member member = memberRepository.findByUsername(memberLoginRequestDto.getUsername())
-//                .orElseThrow(LoginFailureException::new);
-//
-//        if (!passwordEncoder.matches(memberLoginRequestDto.getPassword(), member.getPassword())) {
-//            throw new LoginFailureException();
-//        }
-//
-//        return new MemberLoginResponseDto(member.getId(), jwtTokenProvider.createAccessToken(memberLoginRequestDto.getUsername()));
-//    }
 
 
     public ResponseEntity<?> createAuthenticationToken(MemberLoginRequestDto memberLoginRequestDto) {
@@ -104,6 +97,16 @@ public class MemberService {
         memberJoinForm.setPassword(passwordEncoder.encode(memberJoinForm.getPassword()));
         memberJoinForm.setRole(Role.valueOf(role.toUpperCase()));
         Member newMember = memberJoinForm.toEntity();
+
+        //이메일 인증 토큰 값 생성
+        newMember.generateEmailCheckToken();
+
+        //이메일 보내기
+        SimpleMailMessage mailMessage = new SimpleMailMessage();
+        mailMessage.setTo(newMember.getEmail());
+        mailMessage.setSubject("GODtudy, 회원 가입 인증");
+        mailMessage.setText("/check-email-token?token=" + newMember.getEmailCheckToken() + "&email=" + newMember.getEmail());
+        javaMailSender.send(mailMessage);
 
         return memberRepository.save(newMember);
     }

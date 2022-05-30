@@ -5,8 +5,10 @@ import lombok.*;
 
 import javax.persistence.*;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 @Entity
 @Getter
@@ -38,7 +40,7 @@ public class Member extends BaseEntity {
     @Column(nullable = false)
     private LocalDate birthday;
 
-    private Boolean emailVerified;
+    private Boolean emailVerified = false;
 
     private String emailCheckToken; // 이메일 인증 토큰
 
@@ -53,8 +55,14 @@ public class Member extends BaseEntity {
     @Column(nullable = false)
     private Role role;
 
-    public void addSubject(Subject subject) {
-        this.subject.add(subject);
+    // 이메일 체크 토근 랜덤한 값 생성
+    public void generateEmailCheckToken() {
+        this.emailCheckToken = UUID.randomUUID().toString();
     }
 
+    // 이메일 인증 완료 시
+    public void updateEmailVerified(boolean verified, LocalDateTime regDate){
+        this.emailVerified = verified;
+        this.createdDate = regDate;
+    }
 }

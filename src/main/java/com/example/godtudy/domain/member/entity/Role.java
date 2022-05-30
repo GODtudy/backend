@@ -8,8 +8,11 @@ import lombok.RequiredArgsConstructor;
 public enum Role {
     ADMIN("ROLE_ADMIN"),
     TEACHER("ROLE_TEACHER"),
-    PARENTS("PARENTS"),
-    STUDENT("STUDENT");
+    PARENTS("ROLE_PARENTS"),
+    STUDENT("ROLE_STUDENT"),
+    TMP_TEACHER("ROLE_TMP_TEACHER"),
+    TMP_PARENTS("ROLE_TMP_PARENTS"),
+    TMP_STUDENT("ROLE_TMP_STUDENT");
 
     private final String key;
 }
