@@ -43,8 +43,8 @@ public class MemberApiController {
 //    }
 
     @PostMapping("/login")
-    public ResponseEntity<?> createAuthenticationToken_login(@RequestBody MemberLoginRequestDto memberLoginRequestDto) {
-        return memberService.createAuthenticationToken(memberLoginRequestDto);
+    public ResponseEntity<?> login(@RequestBody MemberLoginRequestDto memberLoginRequestDto) {
+        return memberService.login(memberLoginRequestDto);
     }
 
     @PostMapping("/auth/token")
@@ -53,8 +53,8 @@ public class MemberApiController {
     }
 
     @PostMapping("/logout")
-    public void deleteAuthenticationToken(@RequestBody MemberLogoutRequestDto memberLogoutRequestDto) {
-        memberService.deleteAuthenticationToken(memberLogoutRequestDto);
+    public void logout(@RequestBody MemberLogoutRequestDto memberLogoutRequestDto) {
+        memberService.logout(memberLogoutRequestDto);
     }
 
     /*     회원가입     */

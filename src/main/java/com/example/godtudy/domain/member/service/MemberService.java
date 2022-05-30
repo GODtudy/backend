@@ -45,7 +45,7 @@ public class MemberService {
 
 
 
-    public ResponseEntity<?> createAuthenticationToken(MemberLoginRequestDto memberLoginRequestDto) {
+    public ResponseEntity<?> login(MemberLoginRequestDto memberLoginRequestDto) {
         Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(memberLoginRequestDto.getUsername(), memberLoginRequestDto.getPassword()));
 
@@ -85,7 +85,8 @@ public class MemberService {
         return ResponseEntity.ok(new JwtTokenResponseDto(accessToken));
     }
 
-    public void deleteAuthenticationToken(MemberLogoutRequestDto memberLogoutRequestDto) {
+    // 로그아웃 토근제거
+    public void logout(MemberLogoutRequestDto memberLogoutRequestDto) {
         jwtRefreshTokenRepository.deleteById(memberLogoutRequestDto.getUsername());
     }
 
