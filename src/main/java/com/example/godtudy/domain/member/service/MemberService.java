@@ -1,5 +1,7 @@
 package com.example.godtudy.domain.member.service;
 
+import com.example.godtudy.domain.mail.EmailMessage;
+import com.example.godtudy.domain.mail.EmailService;
 import com.example.godtudy.domain.member.dto.request.*;
 import com.example.godtudy.domain.member.dto.response.JwtTokenResponseDto;
 import com.example.godtudy.domain.member.dto.response.MemberLoginResponseDto;
@@ -10,20 +12,28 @@ import com.example.godtudy.domain.member.repository.SubjectRepository;
 import com.example.godtudy.global.advice.exception.MemberEmailAlreadyExistsException;
 import com.example.godtudy.global.advice.exception.MemberNicknameAlreadyExistsException;
 import com.example.godtudy.global.advice.exception.MemberUsernameAlreadyExistsException;
+import com.example.godtudy.global.config.AppProperties;
 import com.example.godtudy.global.security.jwt.JwtTokenProvider;
 import com.example.godtudy.global.security.member.MemberDetails;
 import com.example.godtudy.global.security.member.MemberDetailsService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.thymeleaf.TemplateEngine;
+import org.thymeleaf.context.Context;
+
+import java.time.LocalDateTime;
+import java.util.Optional;
 
 
 @Slf4j
@@ -32,11 +42,14 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class MemberService {
 
+    private final EmailService emailService;
     private final MemberRepository memberRepository;
     private final SubjectRepository subjectRepository;
     private final JwtRefreshTokenRepository jwtRefreshTokenRepository;
 
+    private final TemplateEngine templateEngine;
     private final JavaMailSender javaMailSender;
+    private final AppProperties appProperties;
 
     private final AuthenticationManager authenticationManager;
     private final JwtTokenProvider jwtTokenProvider;
@@ -101,17 +114,65 @@ public class MemberService {
         //이메일 인증 토큰 값 생성
         newMember.generateEmailCheckToken();
 
-        //이메일 보내기
-        SimpleMailMessage mailMessage = new SimpleMailMessage();
-        mailMessage.setTo(newMember.getEmail());
-        mailMessage.setSubject("GODtudy, 회원 가입 인증");
-        mailMessage.setText("/check-email-token?token=" + newMember.getEmailCheckToken() + "&email=" + newMember.getEmail());
-        javaMailSender.send(mailMessage);
+        sendJoinConfirmEmail(newMember);
+
 
         return memberRepository.save(newMember);
     }
 
+    /* 이메일 보내기 */
+    public void sendJoinConfirmEmail(Member member) {
+        Context context = new Context();
+        context.setVariable("link", "/api/member/checkEmailToken/" + member.getEmailCheckToken() + "/" + member.getEmail());
+        context.setVariable("username", member.getUsername());
+        context.setVariable("linkName", "이메일 인증하기");
+        context.setVariable("message", "GODtudy 서비스를 사용하려면 아래 링크를 클릭하세요!");
+        context.setVariable("host", appProperties.getHost());
+        String message = templateEngine.process("mail/simple-link", context);
+
+        EmailMessage emailMessage = EmailMessage.builder()
+                .to(member.getEmail())
+                .subject("GODtudy, 회원가입 인증")
+                .message(message)
+                .build();
+        emailService.sendEmail(emailMessage);
+    }
+
+
+
+    /*  이메일로 보낸 토큰 확인   */
+    public ResponseEntity<?> checkEmailToken(String token, String email) {
+        Member member = memberRepository.findByEmail(email)
+                .orElseThrow(() -> new UsernameNotFoundException("유효하지 않은 이메일입니다."));
+        if(member.getEmailVerified() == true) {
+            log.info("1======================================================");
+            return new ResponseEntity<>("이미 인증된 회원입니다.", HttpStatus.BAD_REQUEST);
+        }
+        //이메일 토큰이 같은지
+        if (!member.isValidToken(token)) {
+            log.info("2======================================================");
+            return new ResponseEntity<>("유요하지 않은 토큰입니다.", HttpStatus.BAD_REQUEST);
+        }
+
+        return completeJoinMember(member);
+    }
+
+    private ResponseEntity<?> completeJoinMember(Member member) {
+        member.updateEmailVerified(true, LocalDateTime.now());
+        if (member.getRole() == Role.TMP_PARENTS) {
+            member.setRole(Role.PARENTS);
+        } else if (member.getRole() == Role.TMP_STUDENT) {
+            member.setRole(Role.STUDENT);
+        } else {
+            member.setRole(Role.TEACHER);
+        }
+
+        return new ResponseEntity<>("Join Success Final", HttpStatus.OK);
+    }
+
+
     /*   과목 명 받아서 저장   */
+
     public void addSubject(Member member, MemberJoinForm memberJoinForm) {
         if (memberJoinForm.getSubject().isEmpty()) {
             throw new IllegalArgumentException("입력하지 않은 부분이 있습니다. 확인해 주세요.");
@@ -121,7 +182,6 @@ public class MemberService {
             subjectRepository.save(subject);
         }
     }
-
     //아이디 중복확인
     @Transactional(readOnly = true)
     public void usernameCheckDuplication(UsernameRequestDto usernameRequestDto) {
@@ -131,6 +191,7 @@ public class MemberService {
                 });
     }
     // 인증된 이메일 Or 이메일 중복확인
+
     @Transactional(readOnly = true)
     public void emailCheckDuplication(EmailRequestDto emailRequestDto) {
         memberRepository.findByEmail(emailRequestDto.getEmail())
@@ -138,8 +199,8 @@ public class MemberService {
                     throw new MemberEmailAlreadyExistsException("이미 인증된 이메일 입니다.");
                 });
     }
-
     //닉네임 중복확인
+
     @Transactional(readOnly = true)
     public void nicknameCheckDuplication(NicknameRequestDto nicknameRequestDto) {
         memberRepository.findByNickname(nicknameRequestDto.getNickname())

@@ -83,6 +83,7 @@ public class MemberJoinForm {
                 .nickname(nickname)
                 .birthday(date)
                 .role(role)
+                .emailVerified(false)
                 .build();
     }
 
