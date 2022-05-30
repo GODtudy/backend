@@ -40,7 +40,7 @@ public class MemberDetails implements UserDetails {
     //계정 만료 여부 -> true(만료되지 않음)
     @Override
     public boolean isAccountNonExpired() {
-        return false;
+        return true;
     }
 
     //계정 잠김 여부 -> true(잠기지 않음)
