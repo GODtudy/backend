@@ -43,7 +43,7 @@ class MemberApiControllerTest {
                 .nickname("숲속의냉면")
                 .year("1997").month("02").day("12")
                 .build();
-        memberService.joinMember(memberJoinForm, "student");
+        memberService.initJoinMember(memberJoinForm, "student");
     }
 
     @AfterEach

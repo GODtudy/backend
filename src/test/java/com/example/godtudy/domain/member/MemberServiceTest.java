@@ -2,7 +2,6 @@ package com.example.godtudy.domain.member;
 
 import com.example.godtudy.domain.member.dto.request.MemberJoinForm;
 import com.example.godtudy.domain.member.entity.Member;
-import com.example.godtudy.domain.member.entity.Role;
 import com.example.godtudy.domain.member.repository.MemberRepository;
 import com.example.godtudy.domain.member.service.MemberService;
 import org.junit.jupiter.api.AfterEach;
@@ -42,7 +41,7 @@ class MemberServiceTest {
                 .nickname("숲속의냉면")
                 .year("1997").month("02").day("12")
                 .build();
-        memberService.joinMember(memberJoinForm, "student");
+        memberService.initJoinMember(memberJoinForm, "student");
     }
 
     @AfterEach
@@ -64,7 +63,7 @@ class MemberServiceTest {
                 .year("1997").month("02").day("12")
                 .build();
         //when
-        memberService.joinMember(newMember, "student");
+        memberService.initJoinMember(newMember, "student");
 
         //then
         Member member = memberRepository.findByUsername(newMember.getUsername()).orElseThrow(() -> new Exception("유저가 없습니다."));

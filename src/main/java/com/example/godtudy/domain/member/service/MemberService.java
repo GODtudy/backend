@@ -90,13 +90,12 @@ public class MemberService {
         jwtRefreshTokenRepository.deleteById(memberLogoutRequestDto.getUsername());
     }
 
-
-
     /*  회원가입  */
-    public Member joinMember(MemberJoinForm memberJoinForm, String role) {
+    public Member initJoinMember(MemberJoinForm memberJoinForm, String role) {
+        String tmpRole = "TMP_" + role.toUpperCase();
 
         memberJoinForm.setPassword(passwordEncoder.encode(memberJoinForm.getPassword()));
-        memberJoinForm.setRole(Role.valueOf(role.toUpperCase()));
+        memberJoinForm.setRole(Role.valueOf(tmpRole));
         Member newMember = memberJoinForm.toEntity();
 
         //이메일 인증 토큰 값 생성

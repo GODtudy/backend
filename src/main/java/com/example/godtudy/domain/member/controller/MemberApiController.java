@@ -1,10 +1,8 @@
 package com.example.godtudy.domain.member.controller;
 
 import com.example.godtudy.domain.member.dto.request.*;
-import com.example.godtudy.domain.member.dto.response.MemberLoginResponseDto;
 import com.example.godtudy.domain.member.service.MemberService;
 import com.example.godtudy.domain.member.entity.Member;
-import com.example.godtudy.domain.member.entity.Role;
 import com.example.godtudy.domain.member.validator.MemberJoinFormValidator;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -34,13 +32,6 @@ public class MemberApiController {
         webDataBinder.addValidators(memberJoinFormValidator);
     }
 
-//    /*     로그인     */
-//    @PostMapping("/login")
-//    public ResponseEntity<MemberLoginResponseDto> login(@RequestBody MemberLoginRequestDto memberLoginRequestDto) {
-//        MemberLoginResponseDto memberLoginResponseDto = memberService.loginMember(memberLoginRequestDto);
-//
-//        return new ResponseEntity<>(memberLoginResponseDto, HttpStatus.OK);
-//    }
 
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody MemberLoginRequestDto memberLoginRequestDto) {
@@ -63,8 +54,7 @@ public class MemberApiController {
         if (errors.hasErrors()) {
             return new ResponseEntity<>(errors.getAllErrors(), HttpStatus.BAD_REQUEST);
         }
-        memberJoinForm.setRole(Role.STUDENT);
-        Member member = memberService.joinMember(memberJoinForm, role);
+        Member member = memberService.initJoinMember(memberJoinForm, role);
         memberService.addSubject(member, memberJoinForm);
 
         return new ResponseEntity<>("Join Success", HttpStatus.OK);
