@@ -33,16 +33,19 @@ public class MemberApiController {
     }
 
 
+    /*   로그인   */
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody MemberLoginRequestDto memberLoginRequestDto) {
         return memberService.login(memberLoginRequestDto);
     }
 
+    /*   accesstoken만료 시 재발급   */
     @PostMapping("/auth/token")
     public ResponseEntity<?> reissueAuthenticationToken(@RequestBody TokenRequestDto tokenRequestDto) {
         return memberService.reissueAuthenticationToken(tokenRequestDto);
     }
 
+    /*   로그아웃   */
     @PostMapping("/logout")
     public void logout(@RequestBody MemberLogoutRequestDto memberLogoutRequestDto) {
         memberService.logout(memberLogoutRequestDto);
@@ -58,6 +61,12 @@ public class MemberApiController {
         memberService.addSubject(member, memberJoinForm);
 
         return new ResponseEntity<>("Join Success", HttpStatus.OK);
+    }
+
+    /*   이메일 인증   */
+    @GetMapping("/checkEmailToken/{token}/{email}")
+    public ResponseEntity<?> checkEmailToken(@PathVariable String token, @PathVariable String email) {
+        return memberService.checkEmailToken(token, email);
     }
 
     /*     아이디 중복 확인     */
