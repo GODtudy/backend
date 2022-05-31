@@ -32,5 +32,9 @@ public class MemberJoinFormValidator implements Validator {
             errors.rejectValue("nickname", "invalid nickname", new Object[]{memberJoinForm.getNickname()}, "이미 사용중인 닉네임 입니다.");
         }
 
+        if (!memberJoinForm.getPassword().equals(memberJoinForm.getPasswordConfirm())) {
+            errors.rejectValue("password", "invalid password", new Object[]{memberJoinForm.getPasswordConfirm()}, "비밀번호를 확인해 주세요");
+        }
+
     }
 }

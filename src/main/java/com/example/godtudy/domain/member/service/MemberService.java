@@ -136,6 +136,7 @@ public class MemberService {
                 .message(message)
                 .build();
         emailService.sendEmail(emailMessage);
+        //TODO 현재 host가 제대로 작동하지 않았음 그래서 확인해야함 null로나옴
     }
 
 
@@ -169,6 +170,7 @@ public class MemberService {
 
         return new ResponseEntity<>("Join Success Final", HttpStatus.OK);
     }
+
 
 
     /*   과목 명 받아서 저장   */
