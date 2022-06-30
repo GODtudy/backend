@@ -64,9 +64,13 @@ public class MemberService {
 
         final String accessToken = jwtTokenProvider.createAccessToken(memberLoginRequestDto.getUsername());
         final String refreshToken = jwtTokenProvider.createRefreshToken();
+        JwtRefreshToken jwtRefreshToken = JwtRefreshToken.builder()
+                .username(memberLoginRequestDto.getUsername())
+                .refreshToken(refreshToken)
+                .build();
 
         // 데이터베이스에 Refresh Token 저장
-        jwtRefreshTokenRepository.save(new JwtRefreshToken(memberLoginRequestDto.getUsername(), refreshToken));
+        jwtRefreshTokenRepository.save(jwtRefreshToken);
 
         final MemberDetails memberDetails = (MemberDetails) memberDetailsService.loadUserByUsername(memberLoginRequestDto.getUsername());
 
@@ -83,9 +87,10 @@ public class MemberService {
 
         // Access Token 에 기술된 사용자 이름 가져오기
         String username = jwtTokenProvider.getUsernameFromToken(tokenRequestDto.getAccessToken());
+        JwtRefreshToken byUsername = jwtRefreshTokenRepository.findByUsername(username);
 
         // 데이터베이스에 저장된 Refresh Token 과 비교
-        JwtRefreshToken jwtRefreshToken = jwtRefreshTokenRepository.findById(username).orElseThrow(
+        JwtRefreshToken jwtRefreshToken = jwtRefreshTokenRepository.findById(byUsername.getId()).orElseThrow(
                 () -> new IllegalArgumentException("잘못된 요청입니다. 다시 로그인해주세요.")
         );
         if (!jwtRefreshToken.getRefreshToken().equals(tokenRequestDto.getRefreshToken())) {
@@ -100,7 +105,8 @@ public class MemberService {
 
     // 로그아웃 토근제거
     public void logout(MemberLogoutRequestDto memberLogoutRequestDto) {
-        jwtRefreshTokenRepository.deleteById(memberLogoutRequestDto.getUsername());
+        JwtRefreshToken refreshToken = jwtRefreshTokenRepository.findByUsername(memberLogoutRequestDto.getUsername());
+        jwtRefreshTokenRepository.deleteById(refreshToken.getId());
     }
 
     /*  회원가입  */
@@ -115,8 +121,6 @@ public class MemberService {
         newMember.generateEmailCheckToken();
 
         sendJoinConfirmEmail(newMember);
-
-
         return memberRepository.save(newMember);
     }
 
