@@ -46,6 +46,7 @@ public class Member extends BaseEntity {
 
     private LocalDateTime emailCheckTokenGeneratedAt;
 
+    @Lob @Basic(fetch = FetchType.EAGER)
     private String profileImageUrl;
 
     private String bio;
@@ -63,7 +64,8 @@ public class Member extends BaseEntity {
 
     // 이메일 체크 토근 랜덤한 값 생성
     public void generateEmailCheckToken() {
-        this.emailCheckToken = UUID.randomUUID().toString();
+        this.emailCheckToken = UUID.
+                randomUUID().toString();
         this.emailCheckTokenGeneratedAt = LocalDateTime.now();
     }
 

@@ -49,7 +49,7 @@ public class InitDb {
                         .birthday(LocalDate.of(1960 + random.nextInt(60),
                                 1 + random.nextInt(12),
                                 1 + random.nextInt(28)))
-                        .role(Role.values()[random.nextInt(Role.values().length)])
+                        .role(Role.values()[random.nextInt(Role.values().length - 3)])
                         .build();
 
                 memberRepository.save(member);
