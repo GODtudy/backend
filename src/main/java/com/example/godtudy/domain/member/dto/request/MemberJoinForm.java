@@ -73,8 +73,6 @@ public class MemberJoinForm {
     @NotBlank(message = "필수 입력사항 입니다.", groups = ValidationGroups.NotEmptyGroup.class)
     private List<SubjectEnum> subject;
 
-
-
     public Member toEntity(){
         String birthday = year + "-" + month + "-" + day;
         LocalDate date = LocalDate.parse(birthday, DateTimeFormatter.ISO_DATE);

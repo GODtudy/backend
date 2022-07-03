@@ -21,7 +21,7 @@ import java.util.stream.IntStream;
 public class InitDb {
 
     private final MemberInitService memberInitService;
-    private static final int COUNT = 30;
+    private static final int COUNT = 5;
 
     @PostConstruct
     public void init() {
