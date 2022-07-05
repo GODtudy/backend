@@ -16,11 +16,6 @@ import java.util.List;
 @Builder
 public class MemberDetails implements UserDetails {
 
-//    private Long id;
-//    private String username;
-//    private String password;
-//    List<GrantedAuthority> authorities;
-
     private Member member;
 
     public MemberDetails(Member member) {

@@ -15,7 +15,9 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.test.context.support.WithSecurityContextFactory;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 public class WithMemberSecurityContextFactory implements WithSecurityContextFactory<WithMember> {
 
@@ -29,8 +31,10 @@ public class WithMemberSecurityContextFactory implements WithSecurityContextFact
     public SecurityContext createSecurityContext(WithMember withMember) {
         String nickname = withMember.value();
 
+//        Set<SubjectEnum> subject = new HashSet<>();
         List<SubjectEnum> subject = new ArrayList<>();
         subject.add(SubjectEnum.BIOLOGY);
+        subject.add(SubjectEnum.CHEMISTRY);
 
         MemberJoinForm memberJoinForm = MemberJoinForm.builder()
                 .username(nickname)

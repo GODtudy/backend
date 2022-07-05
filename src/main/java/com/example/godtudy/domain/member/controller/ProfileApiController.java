@@ -1,5 +1,6 @@
 package com.example.godtudy.domain.member.controller;
 
+import com.example.godtudy.domain.member.dto.request.ProfileRequestDto;
 import com.example.godtudy.domain.member.dto.response.ProfileResponseDto;
 import com.example.godtudy.domain.member.entity.CurrentMember;
 import com.example.godtudy.domain.member.entity.Member;
@@ -10,6 +11,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
+
 @Slf4j
 @RestController
 @RequestMapping("/api/profile")
@@ -18,10 +21,16 @@ public class ProfileApiController {
 
     private final ProfileService profileService;
 
-    @GetMapping("{profileId}")
+    @GetMapping("/{profileId}")
     public ResponseEntity<ProfileResponseDto> profileInquiry(@CurrentMember Member member, @PathVariable String profileId) {
         ProfileResponseDto profile = profileService.getProfile(member);
         return new ResponseEntity<>(profile, HttpStatus.OK);
+    }
+
+    @PostMapping("/update")
+    public ResponseEntity<?> updateProfile(@CurrentMember Member member, @Valid ProfileRequestDto profileRequestDto) {
+        profileService.updateProfile(member, profileRequestDto);
+        return new ResponseEntity<>("update Ok", HttpStatus.OK);
     }
 
 }

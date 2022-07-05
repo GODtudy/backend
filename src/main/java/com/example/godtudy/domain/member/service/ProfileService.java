@@ -1,5 +1,6 @@
 package com.example.godtudy.domain.member.service;
 
+import com.example.godtudy.domain.member.dto.request.ProfileRequestDto;
 import com.example.godtudy.domain.member.dto.response.ProfileResponseDto;
 import com.example.godtudy.domain.member.entity.Member;
 import lombok.RequiredArgsConstructor;
@@ -19,5 +20,9 @@ public class ProfileService {
                 .profileImageUrl(member.getProfileImageUrl())
                 .subject(member.getSubject())
                 .build();
+    }
+
+    public void updateProfile(Member member, ProfileRequestDto profileRequestDto) {
+        member.updateProfile(profileRequestDto);
     }
 }

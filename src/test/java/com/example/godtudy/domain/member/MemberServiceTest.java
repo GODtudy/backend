@@ -1,7 +1,10 @@
 package com.example.godtudy.domain.member;
 
+import com.example.godtudy.WithMember;
 import com.example.godtudy.domain.member.dto.request.MemberJoinForm;
 import com.example.godtudy.domain.member.entity.Member;
+import com.example.godtudy.domain.member.entity.Subject;
+import com.example.godtudy.domain.member.entity.SubjectEnum;
 import com.example.godtudy.domain.member.repository.MemberRepository;
 import com.example.godtudy.domain.member.service.MemberService;
 import org.junit.jupiter.api.AfterEach;
@@ -14,6 +17,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityManager;
+
+import java.util.*;
 
 import static org.assertj.core.api.Assertions.*;
 
@@ -31,8 +36,12 @@ class MemberServiceTest {
     PasswordEncoder passwordEncoder;
 
 
+
     @BeforeEach
     void beforeEach(){
+        List<SubjectEnum> subjectEnums = new ArrayList<>();
+        subjectEnums.add(SubjectEnum.BIOLOGY);
+        subjectEnums.add(SubjectEnum.CHEMISTRY);
         MemberJoinForm memberJoinForm = MemberJoinForm.builder()
                 .username("swchoi1997")
                 .password("tkddnjs4371@")
@@ -40,6 +49,7 @@ class MemberServiceTest {
                 .email("swchoi1997@naver.com")
                 .nickname("숲속의냉면")
                 .year("1997").month("02").day("12")
+                .subject(subjectEnums)
                 .build();
         memberService.initJoinMember(memberJoinForm, "student");
     }
@@ -75,5 +85,26 @@ class MemberServiceTest {
         assertThat(member.getNickname()).isEqualTo(newMember.getNickname());
         assertThat(passwordEncoder.matches(member.getPassword(), newMember.getPassword()));
     }
+
+    @WithMember("swchoi1996")
+    @DisplayName("회원가입 후 - 과목 불러오기")
+    @Test
+    public void getSubjectForMember() throws Exception{
+        //given
+        Optional<Member> member = memberRepository.findByUsername("swchoi1996");
+        Member member1 = member.get();
+        List<Subject> subject = member1.getSubject();
+        System.out.println(Arrays.toString(subject.toArray()));
+        System.out.println("------------------------");
+        for (Subject sub : subject) {
+            System.out.println(sub.getTitle() + sub.getMember().getUsername());
+        }
+        System.out.println("------------------------");
+
+        //when
+
+        //then
+    }
+
 
 }

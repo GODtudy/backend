@@ -1,15 +1,16 @@
 package com.example.godtudy.domain.member.entity;
 
 import com.example.godtudy.domain.BaseEntity;
+import com.example.godtudy.domain.member.dto.request.ProfileRequestDto;
 import lombok.*;
+import lombok.extern.slf4j.Slf4j;
 
 import javax.persistence.*;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
+@Slf4j
 @Entity
 @Getter
 @EqualsAndHashCode(of = "id")
@@ -52,6 +53,7 @@ public class Member extends BaseEntity {
     private String bio;
 
     @OneToMany(mappedBy = "member")
+//    private Set<Subject> subject = new HashSet<>();
     private List<Subject> subject = new ArrayList<>();
 
     @Enumerated(EnumType.STRING)
@@ -83,4 +85,19 @@ public class Member extends BaseEntity {
     public boolean isValidToken(String token) {
         return this.emailCheckToken.equals(token);
     }
+
+    public void updateProfile(ProfileRequestDto profileRequestDto) {
+        this.nickname = profileRequestDto.getNickname();
+        this.bio = profileRequestDto.getBio();
+        this.profileImageUrl = profileRequestDto.getProfileImageUrl();
+
+    }
+    public void addSubject(Subject subject) {
+        this.subject.add(subject);
+        if (subject.getMember() != this) {
+            subject.setMember(this);
+        }
+    }
+
+
 }

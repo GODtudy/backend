@@ -58,7 +58,8 @@ public class MemberApiController {
             return new ResponseEntity<>(errors.getAllErrors(), HttpStatus.BAD_REQUEST);
         }
         Member member = memberService.initJoinMember(memberJoinForm, role);
-        memberService.addSubject(member, memberJoinForm);
+
+        memberService.sendJoinConfirmEmail(member);
 
         return new ResponseEntity<>("Join Success", HttpStatus.OK);
     }

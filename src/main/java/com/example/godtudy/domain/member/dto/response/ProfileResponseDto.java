@@ -7,7 +7,9 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Data
 @NoArgsConstructor
@@ -25,7 +27,9 @@ public class ProfileResponseDto {
 
     private String profileImageUrl;
 
+    //    private Set<Subject> subject = new HashSet<>();
     private List<Subject> subject = new ArrayList<>();
+
 
 
 }
