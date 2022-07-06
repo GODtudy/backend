@@ -86,6 +86,29 @@ class MemberServiceTest {
         assertThat(passwordEncoder.matches(member.getPassword(), newMember.getPassword()));
     }
 
+    @DisplayName("학생 회원가입 - 비밀번호 오류(비밀번호 양식 확인)")
+    @Test
+    public void joinStudentErrorByPassword() throws Exception{
+        //given
+        MemberJoinForm newMember = MemberJoinForm.builder()
+                .username("test40")
+                .password("tkd")
+                .name("최상원")
+                .email("test40@naver.com")
+                .nickname("test40")
+                .year("1997").month("02").day("12")
+                .build();
+        //when
+        memberService.initJoinMember(newMember, "student");
+
+        //then
+
+
+
+    }
+
+
+    // 회원가입 불가능한상황 ->
     @WithMember("swchoi1996")
     @DisplayName("회원가입 후 - 과목 불러오기")
     @Test

@@ -60,6 +60,15 @@ public class Member extends BaseEntity {
     @Column(nullable = false)
     private Role role;
 
+    // == 연관관계 편의 메서드 ==//
+    public void addSubject(Subject subject) {
+        this.subject.add(subject);
+        if (subject.getMember() != this) {
+            subject.setMember(this);
+        }
+    }
+    // ==        == //
+
     public void setRole(Role role) {
         this.role = role;
     }
@@ -76,6 +85,7 @@ public class Member extends BaseEntity {
         this.emailVerified = verified;
         this.createdDate = regDate;
     }
+
     //이메일 인증을 얼마나 자주 할 수 있을
     public boolean canSendConfirmEmail() {
 //        return this.emailCheckTokenGeneratedAt.isBefore(LocalDateTime.now().minusHours(1));
@@ -86,18 +96,16 @@ public class Member extends BaseEntity {
         return this.emailCheckToken.equals(token);
     }
 
+    //프로필 업데이트
     public void updateProfile(ProfileRequestDto profileRequestDto) {
         this.nickname = profileRequestDto.getNickname();
         this.bio = profileRequestDto.getBio();
         this.profileImageUrl = profileRequestDto.getProfileImageUrl();
 
     }
-    public void addSubject(Subject subject) {
-        this.subject.add(subject);
-        if (subject.getMember() != this) {
-            subject.setMember(this);
-        }
+
+    //비밀번호 업데이트
+    public void updatePassword(String newPassword) {
+        this.password = newPassword;
     }
-
-
 }
