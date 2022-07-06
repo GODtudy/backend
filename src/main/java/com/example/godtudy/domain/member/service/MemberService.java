@@ -20,7 +20,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -33,7 +32,8 @@ import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.context.Context;
 
 import java.time.LocalDateTime;
-import java.util.Optional;
+import java.util.List;
+import java.util.Set;
 
 
 @Slf4j
@@ -48,7 +48,6 @@ public class MemberService {
     private final JwtRefreshTokenRepository jwtRefreshTokenRepository;
 
     private final TemplateEngine templateEngine;
-    private final JavaMailSender javaMailSender;
     private final AppProperties appProperties;
 
     private final AuthenticationManager authenticationManager;
@@ -116,13 +115,43 @@ public class MemberService {
         memberJoinForm.setPassword(passwordEncoder.encode(memberJoinForm.getPassword()));
         memberJoinForm.setRole(Role.valueOf(tmpRole));
         Member newMember = memberJoinForm.toEntity();
+        log.info(newMember.getSubject().toString());
+        /*   과목 명 받아서 저장   */
+        addSubject(newMember, memberJoinForm);
 
         //이메일 인증 토큰 값 생성
         newMember.generateEmailCheckToken();
 
-        sendJoinConfirmEmail(newMember);
         return memberRepository.save(newMember);
     }
+
+    /*   과목 명 받아서 저장   */
+
+    public void addSubject(Member newMember, MemberJoinForm memberJoinForm) {
+        if (memberJoinForm.getSubject().isEmpty()) {
+            throw new IllegalArgumentException("입력하지 않은 부분이 있습니다. 확인해 주세요.");
+        }
+        for (SubjectEnum title: memberJoinForm.getSubject()) {
+//            Subject subject = Subject.builder().title(title).member(member).build();
+
+            Subject subject = Subject.createMemberSubject(newMember, title);
+            subjectRepository.save(subject);
+        }
+    }
+
+    private ResponseEntity<?> completeJoinMember(Member member) {
+        member.updateEmailVerified(true, LocalDateTime.now());
+        if (member.getRole() == Role.TMP_PARENTS) {
+            member.setRole(Role.PARENTS);
+        } else if (member.getRole() == Role.TMP_STUDENT) {
+            member.setRole(Role.STUDENT);
+        } else {
+            member.setRole(Role.TEACHER);
+        }
+
+        return new ResponseEntity<>("Join Success Final", HttpStatus.OK);
+    }
+
 
     /* 이메일 보내기 */
     public void sendJoinConfirmEmail(Member member) {
@@ -162,32 +191,8 @@ public class MemberService {
         return completeJoinMember(member);
     }
 
-    private ResponseEntity<?> completeJoinMember(Member member) {
-        member.updateEmailVerified(true, LocalDateTime.now());
-        if (member.getRole() == Role.TMP_PARENTS) {
-            member.setRole(Role.PARENTS);
-        } else if (member.getRole() == Role.TMP_STUDENT) {
-            member.setRole(Role.STUDENT);
-        } else {
-            member.setRole(Role.TEACHER);
-        }
-
-        return new ResponseEntity<>("Join Success Final", HttpStatus.OK);
-    }
 
 
-
-    /*   과목 명 받아서 저장   */
-
-    public void addSubject(Member member, MemberJoinForm memberJoinForm) {
-        if (memberJoinForm.getSubject().isEmpty()) {
-            throw new IllegalArgumentException("입력하지 않은 부분이 있습니다. 확인해 주세요.");
-        }
-        for (SubjectEnum title: memberJoinForm.getSubject()) {
-            Subject subject = Subject.builder().title(title).member(member).build();
-            subjectRepository.save(subject);
-        }
-    }
     //아이디 중복확인
     @Transactional(readOnly = true)
     public void usernameCheckDuplication(UsernameRequestDto usernameRequestDto) {
