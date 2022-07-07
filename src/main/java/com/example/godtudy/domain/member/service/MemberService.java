@@ -153,7 +153,7 @@ public class MemberService {
     }
 
 
-    /* 이메일 보내기 */
+    /* 이메일 보내기 - 회원가입 */
     public void sendJoinConfirmEmail(Member member) {
         Context context = new Context();
         context.setVariable("link", "/api/member/checkEmailToken/" + member.getEmailCheckToken() + "/" + member.getEmail());
@@ -169,7 +169,6 @@ public class MemberService {
                 .message(message)
                 .build();
         emailService.sendEmail(emailMessage);
-        //TODO 현재 host가 제대로 작동하지 않았음 그래서 확인해야함 null로나옴
     }
 
 
@@ -219,4 +218,11 @@ public class MemberService {
                     throw new MemberNicknameAlreadyExistsException("이미 사용중인 닉네임 입니다.");
                 });
     }
+
+    //아이디 찾기
+    public void findUsername(Member member) {
+
+    }
+
+    //이메일 보내기 - 맴버 찾기
 }

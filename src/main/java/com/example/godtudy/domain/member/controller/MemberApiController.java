@@ -1,6 +1,7 @@
 package com.example.godtudy.domain.member.controller;
 
 import com.example.godtudy.domain.member.dto.request.*;
+import com.example.godtudy.domain.member.entity.CurrentMember;
 import com.example.godtudy.domain.member.service.MemberService;
 import com.example.godtudy.domain.member.entity.Member;
 import com.example.godtudy.domain.member.validator.MemberJoinFormValidator;
@@ -100,18 +101,8 @@ public class MemberApiController {
         return new ResponseEntity<>("Check Username", HttpStatus.OK);
     }
 
-//    {
-//        "username": "test1",
-//            "password": "tkddnjs8528##",
-//            "name" : "test1",
-//            "email" : "test1@nvaer.com",
-//            "nickname": "test1",
-//            "year": "1997",
-//            "month": "02",
-//            "day": "12",
-//            "subject": [
-//        "ENGLISH", "BIOLOGY"
-//    ]
-//    }
-
+    @PostMapping("/find/username")
+    public ResponseEntity<?> findUsernameByEmail(@CurrentMember Member member) {
+        memberService.findUsername(member);
+    }
 }

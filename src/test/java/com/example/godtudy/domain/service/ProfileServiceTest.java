@@ -96,16 +96,12 @@ class ProfileServiceTest {
                 .newPasswordConfirm("swchoi1997")
                 .build();
 
-
-//        assertThat(passwordEncoder.matches(member1.getPassword(), "swchoi1997"));
         org.junit.jupiter.api.Assertions.assertFalse(passwordEncoder.matches("swchoi1997", member1.getPassword()));
         //when
         profileService.updatePassword(member1, passwordUpdateRequestDto);
 
         //then
-//        assertThat(passwordEncoder.matches(member1.getPassword(), "swchoi1997"));
         org.junit.jupiter.api.Assertions.assertTrue(passwordEncoder.matches("swchoi1997", member1.getPassword()));
-
     }
 
 

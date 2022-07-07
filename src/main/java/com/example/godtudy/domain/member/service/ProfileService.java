@@ -32,7 +32,6 @@ public class ProfileService {
     public void updateProfile(Member member, ProfileRequestDto profileRequestDto) {
         member.updateProfile(profileRequestDto);
         memberRepository.save(member);
-
     }
 
     public void updatePassword(Member member, PasswordUpdateRequestDto passwordUpdateRequestDto) {
