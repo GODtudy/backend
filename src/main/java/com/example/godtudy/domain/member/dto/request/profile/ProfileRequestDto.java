@@ -1,4 +1,4 @@
-package com.example.godtudy.domain.member.dto.request;
+package com.example.godtudy.domain.member.dto.request.profile;
 
 import com.example.godtudy.domain.member.entity.Subject;
 import com.example.godtudy.global.validation.ValidationGroups;

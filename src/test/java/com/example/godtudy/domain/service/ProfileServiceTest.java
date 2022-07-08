@@ -1,14 +1,12 @@
 package com.example.godtudy.domain.service;
 
 import com.example.godtudy.WithMember;
-import com.example.godtudy.domain.member.dto.request.PasswordUpdateRequestDto;
-import com.example.godtudy.domain.member.dto.request.ProfileRequestDto;
+import com.example.godtudy.domain.member.dto.request.profile.PasswordUpdateRequestDto;
+import com.example.godtudy.domain.member.dto.request.profile.ProfileRequestDto;
 import com.example.godtudy.domain.member.dto.response.ProfileResponseDto;
 import com.example.godtudy.domain.member.entity.Member;
-import com.example.godtudy.domain.member.entity.SubjectEnum;
 import com.example.godtudy.domain.member.repository.MemberRepository;
 import com.example.godtudy.domain.member.service.ProfileService;
-import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,7 +14,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.*;

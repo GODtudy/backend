@@ -1,7 +1,7 @@
 package com.example.godtudy.domain.member.entity;
 
 import com.example.godtudy.domain.BaseEntity;
-import com.example.godtudy.domain.member.dto.request.ProfileRequestDto;
+import com.example.godtudy.domain.member.dto.request.profile.ProfileRequestDto;
 import lombok.*;
 import lombok.extern.slf4j.Slf4j;
 

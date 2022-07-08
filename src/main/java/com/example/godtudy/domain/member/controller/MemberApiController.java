@@ -1,7 +1,10 @@
 package com.example.godtudy.domain.member.controller;
 
 import com.example.godtudy.domain.member.dto.request.*;
-import com.example.godtudy.domain.member.entity.CurrentMember;
+import com.example.godtudy.domain.member.dto.request.profile.FindPasswordRequestDto;
+import com.example.godtudy.domain.member.dto.request.profile.FindUsernameRequestDto;
+import com.example.godtudy.domain.member.dto.response.profile.FindPasswordResponseDto;
+import com.example.godtudy.domain.member.dto.response.profile.FindUsernameResponseDto;
 import com.example.godtudy.domain.member.service.MemberService;
 import com.example.godtudy.domain.member.entity.Member;
 import com.example.godtudy.domain.member.validator.MemberJoinFormValidator;
@@ -102,7 +105,17 @@ public class MemberApiController {
     }
 
     @PostMapping("/find/username")
-    public ResponseEntity<?> findUsernameByEmail(@CurrentMember Member member) {
-        memberService.findUsername(member);
+    public ResponseEntity<?> findUsernameByEmail(@RequestBody FindUsernameRequestDto findUsernameRequestDto) {
+        FindUsernameResponseDto username = memberService.findUsername(findUsernameRequestDto);
+
+        return new ResponseEntity<>(username, HttpStatus.OK);
+    }
+
+    @PostMapping("/find/password")
+    public ResponseEntity<?> findPasswordByEmail(@RequestBody FindPasswordRequestDto findPasswordRequestDto) {
+        FindPasswordResponseDto password = memberService.findPassword(findPasswordRequestDto);
+
+        return new ResponseEntity<>(password, HttpStatus.OK);
+        //TODO 로그인화면으로 리다이엑트
     }
 }

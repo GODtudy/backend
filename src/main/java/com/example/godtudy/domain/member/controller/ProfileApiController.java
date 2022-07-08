@@ -1,7 +1,7 @@
 package com.example.godtudy.domain.member.controller;
 
-import com.example.godtudy.domain.member.dto.request.PasswordUpdateRequestDto;
-import com.example.godtudy.domain.member.dto.request.ProfileRequestDto;
+import com.example.godtudy.domain.member.dto.request.profile.PasswordUpdateRequestDto;
+import com.example.godtudy.domain.member.dto.request.profile.ProfileRequestDto;
 import com.example.godtudy.domain.member.dto.response.ProfileResponseDto;
 import com.example.godtudy.domain.member.entity.CurrentMember;
 import com.example.godtudy.domain.member.entity.Member;

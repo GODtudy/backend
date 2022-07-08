@@ -3,15 +3,18 @@ package com.example.godtudy.domain.member.service;
 import com.example.godtudy.domain.mail.EmailMessage;
 import com.example.godtudy.domain.mail.EmailService;
 import com.example.godtudy.domain.member.dto.request.*;
+import com.example.godtudy.domain.member.dto.request.profile.FindPasswordRequestDto;
+import com.example.godtudy.domain.member.dto.request.profile.FindUsernameRequestDto;
+import com.example.godtudy.domain.member.dto.response.profile.FindPasswordResponseDto;
+import com.example.godtudy.domain.member.dto.response.profile.FindUsernameResponseDto;
 import com.example.godtudy.domain.member.dto.response.JwtTokenResponseDto;
 import com.example.godtudy.domain.member.dto.response.MemberLoginResponseDto;
 import com.example.godtudy.domain.member.entity.*;
-import com.example.godtudy.domain.member.repository.JwtRefreshTokenRepository;
+import com.example.godtudy.domain.member.redis.RedisKey;
+import com.example.godtudy.domain.member.redis.RedisService;
 import com.example.godtudy.domain.member.repository.MemberRepository;
 import com.example.godtudy.domain.member.repository.SubjectRepository;
-import com.example.godtudy.global.advice.exception.MemberEmailAlreadyExistsException;
-import com.example.godtudy.global.advice.exception.MemberNicknameAlreadyExistsException;
-import com.example.godtudy.global.advice.exception.MemberUsernameAlreadyExistsException;
+import com.example.godtudy.global.advice.exception.*;
 import com.example.godtudy.global.config.AppProperties;
 import com.example.godtudy.global.security.jwt.JwtTokenProvider;
 import com.example.godtudy.global.security.member.MemberDetails;
@@ -20,7 +23,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -32,8 +34,7 @@ import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.context.Context;
 
 import java.time.LocalDateTime;
-import java.util.List;
-import java.util.Set;
+import java.util.UUID;
 
 
 @Slf4j
@@ -43,9 +44,10 @@ import java.util.Set;
 public class MemberService {
 
     private final EmailService emailService;
+    private final RedisService redisService;
     private final MemberRepository memberRepository;
     private final SubjectRepository subjectRepository;
-    private final JwtRefreshTokenRepository jwtRefreshTokenRepository;
+
 
     private final TemplateEngine templateEngine;
     private final AppProperties appProperties;
@@ -55,21 +57,17 @@ public class MemberService {
     private final MemberDetailsService memberDetailsService;
     private final PasswordEncoder passwordEncoder;
 
-
-
     public ResponseEntity<?> login(MemberLoginRequestDto memberLoginRequestDto) {
+        if(memberRepository.findByUsername(memberLoginRequestDto.getUsername()).isEmpty()){
+            return new ResponseEntity<>("해당하는 맴버가 없습니다.", HttpStatus.BAD_REQUEST);
+        }
         Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(memberLoginRequestDto.getUsername(), memberLoginRequestDto.getPassword()));
 
-        final String accessToken = jwtTokenProvider.createAccessToken(memberLoginRequestDto.getUsername());
-        final String refreshToken = jwtTokenProvider.createRefreshToken();
-        JwtRefreshToken jwtRefreshToken = JwtRefreshToken.builder()
-                .username(memberLoginRequestDto.getUsername())
-                .refreshToken(refreshToken)
-                .build();
-
-        // 데이터베이스에 Refresh Token 저장
-        jwtRefreshTokenRepository.save(jwtRefreshToken);
+        String accessToken = jwtTokenProvider.createAccessToken(memberLoginRequestDto.getUsername());
+        String refreshToken = jwtTokenProvider.createRefreshToken(memberLoginRequestDto.getUsername());
+        redisService.setDataWithExpiration(RedisKey.REFRESH.getKey() + memberLoginRequestDto.getUsername(),
+                refreshToken, JwtTokenProvider.REFRESH_TOKEN_VALID_TIME);
 
         final MemberDetails memberDetails = (MemberDetails) memberDetailsService.loadUserByUsername(memberLoginRequestDto.getUsername());
 
@@ -83,44 +81,37 @@ public class MemberService {
                 || !jwtTokenProvider.validateToken(tokenRequestDto.getRefreshToken())) {
             throw new IllegalArgumentException("잘못된 요청입니다. 다시 로그인해주세요.");
         }
-
         // Access Token 에 기술된 사용자 이름 가져오기
         String username = jwtTokenProvider.getUsernameFromToken(tokenRequestDto.getAccessToken());
-        JwtRefreshToken byUsername = jwtRefreshTokenRepository.findByUsername(username);
+        String refreshTokenByRedis = redisService.getData(RedisKey.REFRESH.getKey() + username);
 
-        // 데이터베이스에 저장된 Refresh Token 과 비교
-        JwtRefreshToken jwtRefreshToken = jwtRefreshTokenRepository.findById(byUsername.getId()).orElseThrow(
-                () -> new IllegalArgumentException("잘못된 요청입니다. 다시 로그인해주세요.")
-        );
-        if (!jwtRefreshToken.getRefreshToken().equals(tokenRequestDto.getRefreshToken())) {
-            throw new IllegalArgumentException("Refresh Token 정보가 일치하지 않습니다.");
+        if (refreshTokenByRedis == null || !refreshTokenByRedis.equals(tokenRequestDto.getRefreshToken())) {
+            throw new InvalidRefreshTokenException();
         }
+        Member member = memberRepository.findByUsername(username).orElseThrow(MemberNotFoundException::new);
 
         // 새로운 Access Token 발급
-        final String accessToken = jwtTokenProvider.createAccessToken(username);
+        String accessToken = jwtTokenProvider.createAccessToken(member.getUsername());
 
-        return ResponseEntity.ok(new JwtTokenResponseDto(accessToken));
+        return ResponseEntity.ok(new JwtTokenResponseDto(accessToken, refreshTokenByRedis));
     }
 
     // 로그아웃 토근제거
     public void logout(MemberLogoutRequestDto memberLogoutRequestDto) {
-        JwtRefreshToken refreshToken = jwtRefreshTokenRepository.findByUsername(memberLogoutRequestDto.getUsername());
-        jwtRefreshTokenRepository.deleteById(refreshToken.getId());
+        redisService.deleteData(RedisKey.REFRESH.getKey() + memberLogoutRequestDto.getUsername());
     }
 
     /*  회원가입  */
     public Member initJoinMember(MemberJoinForm memberJoinForm, String role) {
         String tmpRole = "TMP_" + role.toUpperCase();
 
+        //TODO 회원가입하고 이메일인증을 하지 않았을 때 같은 이메일로 회원가입이 들어오면 어떻게 해야할가를 생각
         memberJoinForm.setPassword(passwordEncoder.encode(memberJoinForm.getPassword()));
         memberJoinForm.setRole(Role.valueOf(tmpRole));
         Member newMember = memberJoinForm.toEntity();
-        log.info(newMember.getSubject().toString());
-        /*   과목 명 받아서 저장   */
-        addSubject(newMember, memberJoinForm);
 
-        //이메일 인증 토큰 값 생성
-        newMember.generateEmailCheckToken();
+        addSubject(newMember, memberJoinForm); //   과목 명 받아서 저장
+        newMember.generateEmailCheckToken(); //이메일 인증 토큰 값 생성
 
         return memberRepository.save(newMember);
     }
@@ -148,10 +139,8 @@ public class MemberService {
         } else {
             member.setRole(Role.TEACHER);
         }
-
         return new ResponseEntity<>("Join Success Final", HttpStatus.OK);
     }
-
 
     /* 이메일 보내기 - 회원가입 */
     public void sendJoinConfirmEmail(Member member) {
@@ -171,26 +160,20 @@ public class MemberService {
         emailService.sendEmail(emailMessage);
     }
 
-
-
     /*  이메일로 보낸 토큰 확인   */
     public ResponseEntity<?> checkEmailToken(String token, String email) {
         Member member = memberRepository.findByEmail(email)
                 .orElseThrow(() -> new UsernameNotFoundException("유효하지 않은 이메일입니다."));
-        if(member.getEmailVerified() == true) {
-            log.info("1======================================================");
+        if(member.getEmailVerified()) {
             return new ResponseEntity<>("이미 인증된 회원입니다.", HttpStatus.BAD_REQUEST);
         }
         //이메일 토큰이 같은지
         if (!member.isValidToken(token)) {
-            log.info("2======================================================");
             return new ResponseEntity<>("유요하지 않은 토큰입니다.", HttpStatus.BAD_REQUEST);
         }
 
         return completeJoinMember(member);
     }
-
-
 
     //아이디 중복확인
     @Transactional(readOnly = true)
@@ -220,9 +203,54 @@ public class MemberService {
     }
 
     //아이디 찾기
-    public void findUsername(Member member) {
-
+    public FindUsernameResponseDto findUsername(FindUsernameRequestDto findUsernameRequestDto) {
+        // 회원이 존재하는지 확인
+        if (!memberRepository.existsByName(findUsernameRequestDto.getName()) || !memberRepository.existsByEmail(findUsernameRequestDto.getEmail())) {
+            throw new MemberNotFoundException("존재하지 않는 회원정보입니다.");
+        }
+        //TODO 이메일을 인증을 해야할지
+        Member member = memberRepository.findByEmail(findUsernameRequestDto.getEmail()).orElseThrow(MemberNotFoundException::new);
+        return FindUsernameResponseDto.builder().username(member.getUsername()).build();
     }
 
-    //이메일 보내기 - 맴버 찾기
+    //비밀번호 찾기
+    public FindPasswordResponseDto findPassword(FindPasswordRequestDto findPasswordRequestDto) {
+        // 1. 회원이 존재하는지 확인
+        if (!memberRepository.existsByName(findPasswordRequestDto.getName())
+                || !memberRepository.existsByUsername(findPasswordRequestDto.getUsername())
+                || !memberRepository.existsByEmail(findPasswordRequestDto.getEmail())) {
+            throw new MemberNotFoundException("존재하지 않는 회원정보입니다.");
+        }
+
+        //2. 존재하는걸로 판명나면 임시비빌번호 생성
+        Member member = memberRepository.findByUsername(findPasswordRequestDto.getUsername()).orElseThrow();
+        String tmpPassword = UUID.randomUUID().toString();
+        //3. 임시 비밀번호로 비빌번호 변경
+        member.updatePassword(tmpPassword.substring(0, 6));
+        memberRepository.save(member);
+
+        //4. 이메일 보내기
+        sendPasswordConfirmEmail(member);
+
+        return FindPasswordResponseDto.builder().tmpPassword(tmpPassword).build();
+    }
+
+    /* 이메일 보내기 - 비밀번호 찾기 */
+    public void sendPasswordConfirmEmail(Member member) {
+        Context context = new Context();
+        context.setVariable("tmpPassword", member.getPassword());
+        context.setVariable("linkName", "GODtudy 임시 비밀번호 ");
+        context.setVariable("message", "GODtudy 임시 비밀번호 가 발급되었습니다. 아래 비밀번호로 로그인을 진행하세요");
+        context.setVariable("host", appProperties.getHost());
+        String message = templateEngine.process("mail/tmpPassword", context);
+
+        EmailMessage emailMessage = EmailMessage.builder()
+                .to(member.getEmail())
+                .subject("GODtudy, 임시비밀번호 발급")
+                .message(message)
+                .build();
+        emailService.sendEmail(emailMessage);
+    }
+
+
 }
