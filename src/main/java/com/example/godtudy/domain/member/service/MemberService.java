@@ -5,7 +5,6 @@ import com.example.godtudy.domain.mail.EmailService;
 import com.example.godtudy.domain.member.dto.request.*;
 import com.example.godtudy.domain.member.dto.request.profile.FindPasswordRequestDto;
 import com.example.godtudy.domain.member.dto.request.profile.FindUsernameRequestDto;
-import com.example.godtudy.domain.member.dto.response.profile.FindPasswordResponseDto;
 import com.example.godtudy.domain.member.dto.response.profile.FindUsernameResponseDto;
 import com.example.godtudy.domain.member.dto.response.JwtTokenResponseDto;
 import com.example.godtudy.domain.member.dto.response.MemberLoginResponseDto;
@@ -123,8 +122,6 @@ public class MemberService {
             throw new IllegalArgumentException("입력하지 않은 부분이 있습니다. 확인해 주세요.");
         }
         for (SubjectEnum title: memberJoinForm.getSubject()) {
-//            Subject subject = Subject.builder().title(title).member(member).build();
-
             Subject subject = Subject.createMemberSubject(newMember, title);
             subjectRepository.save(subject);
         }
@@ -183,17 +180,17 @@ public class MemberService {
                     throw new MemberUsernameAlreadyExistsException("이미 사용중인 아이디 입니다.");
                 });
     }
-    // 인증된 이메일 Or 이메일 중복확인
 
+    // 인증된 이메일 Or 이메일 중복확인
     @Transactional(readOnly = true)
     public void emailCheckDuplication(EmailRequestDto emailRequestDto) {
         memberRepository.findByEmail(emailRequestDto.getEmail())
                 .ifPresent(e -> {
-                    throw new MemberEmailAlreadyExistsException("이미 인증된 이메일 입니다.");
+                    throw new MemberEmailAlreadyExistsException("이미 등록된 이메일 입니다.");
                 });
     }
-    //닉네임 중복확인
 
+    //닉네임 중복확인
     @Transactional(readOnly = true)
     public void nicknameCheckDuplication(NicknameRequestDto nicknameRequestDto) {
         memberRepository.findByNickname(nicknameRequestDto.getNickname())
@@ -214,7 +211,7 @@ public class MemberService {
     }
 
     //비밀번호 찾기
-    public FindPasswordResponseDto findPassword(FindPasswordRequestDto findPasswordRequestDto) {
+    public ResponseEntity<?> findPassword(FindPasswordRequestDto findPasswordRequestDto) {
         // 1. 회원이 존재하는지 확인
         if (!memberRepository.existsByName(findPasswordRequestDto.getName())
                 || !memberRepository.existsByUsername(findPasswordRequestDto.getUsername())
@@ -232,7 +229,7 @@ public class MemberService {
         //4. 이메일 보내기
         sendPasswordConfirmEmail(member);
 
-        return FindPasswordResponseDto.builder().tmpPassword(tmpPassword).build();
+        return new ResponseEntity<>("임시 비밀번호를 이메일로 보냈습니다.", HttpStatus.OK);
     }
 
     /* 이메일 보내기 - 비밀번호 찾기 */

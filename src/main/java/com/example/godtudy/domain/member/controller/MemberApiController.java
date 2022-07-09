@@ -3,7 +3,6 @@ package com.example.godtudy.domain.member.controller;
 import com.example.godtudy.domain.member.dto.request.*;
 import com.example.godtudy.domain.member.dto.request.profile.FindPasswordRequestDto;
 import com.example.godtudy.domain.member.dto.request.profile.FindUsernameRequestDto;
-import com.example.godtudy.domain.member.dto.response.profile.FindPasswordResponseDto;
 import com.example.godtudy.domain.member.dto.response.profile.FindUsernameResponseDto;
 import com.example.godtudy.domain.member.service.MemberService;
 import com.example.godtudy.domain.member.entity.Member;
@@ -113,9 +112,6 @@ public class MemberApiController {
 
     @PostMapping("/find/password")
     public ResponseEntity<?> findPasswordByEmail(@RequestBody FindPasswordRequestDto findPasswordRequestDto) {
-        FindPasswordResponseDto password = memberService.findPassword(findPasswordRequestDto);
-
-        return new ResponseEntity<>(password, HttpStatus.OK);
-        //TODO 로그인화면으로 리다이엑트
+        return memberService.findPassword(findPasswordRequestDto);
     }
 }
