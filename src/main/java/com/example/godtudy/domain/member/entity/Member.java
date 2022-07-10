@@ -2,6 +2,7 @@ package com.example.godtudy.domain.member.entity;
 
 import com.example.godtudy.domain.BaseEntity;
 import com.example.godtudy.domain.member.dto.request.ProfileRequestDto;
+import com.example.godtudy.domain.study.entity.Study;
 import lombok.*;
 import lombok.extern.slf4j.Slf4j;
 
@@ -55,6 +56,12 @@ public class Member extends BaseEntity {
     @OneToMany(mappedBy = "member")
 //    private Set<Subject> subject = new HashSet<>();
     private List<Subject> subject = new ArrayList<>();
+
+    @OneToMany(mappedBy = "teacher")
+    private List<Study> teacherStudyList = new ArrayList<>();
+
+    @OneToMany(mappedBy = "student")
+    private List<Study> studentStudyList = new ArrayList<>();
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
