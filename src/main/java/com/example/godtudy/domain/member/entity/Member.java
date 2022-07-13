@@ -2,6 +2,7 @@ package com.example.godtudy.domain.member.entity;
 
 import com.example.godtudy.domain.BaseEntity;
 import com.example.godtudy.domain.member.dto.request.profile.ProfileRequestDto;
+import com.example.godtudy.domain.post.Notice;
 import lombok.*;
 import lombok.extern.slf4j.Slf4j;
 
@@ -56,15 +57,26 @@ public class Member extends BaseEntity {
 //    private Set<Subject> subject = new HashSet<>();
     private List<Subject> subject = new ArrayList<>();
 
+    @OneToMany(mappedBy = "member")
+    private List<Notice> notices = new ArrayList<>();
+
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private Role role;
+
 
     // == 연관관계 편의 메서드 ==//
     public void addSubject(Subject subject) {
         this.subject.add(subject);
         if (subject.getMember() != this) {
             subject.setMember(this);
+        }
+    }
+
+    public void addNotice(Notice notice) {
+        this.notices.add(notice);
+        if (notice.getAuthor() != this) {
+            notice.setAuthor(this);
         }
     }
     // ==        == //
@@ -101,7 +113,6 @@ public class Member extends BaseEntity {
         this.nickname = profileRequestDto.getNickname();
         this.bio = profileRequestDto.getBio();
         this.profileImageUrl = profileRequestDto.getProfileImageUrl();
-
     }
 
     //비밀번호 업데이트
