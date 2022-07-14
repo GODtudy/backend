@@ -1,4 +1,4 @@
-package com.example.godtudy.domain.post;
+package com.example.godtudy.domain.post.entity;
 
 import com.example.godtudy.domain.BaseEntity;
 import com.example.godtudy.domain.member.entity.Member;
@@ -32,6 +32,7 @@ public class Notice extends BaseEntity {
     @Column(nullable = false)
     @ManyToOne
     private Member author;
+
     // == 연관관계 편의 메서드 == //
 
     public void setAuthor(Member author) {
@@ -40,6 +41,13 @@ public class Notice extends BaseEntity {
         }
         this.author = author;
         author.getNotices().add(this);
+    }
+
+    public static Notice createMemberNotice(Member member) {
+        Notice notice = new Notice();
+        notice.setAuthor(member);
+        member.addNotice(notice);
+        return notice;
     }
 
 }
