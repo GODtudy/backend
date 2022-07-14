@@ -25,9 +25,9 @@ public class TeacherService {
     private final JPAQueryFactory queryFactory; // JPAQueryFactory 빈 주입
 
 
-    /**
-      */
-    public List<Member> allTeachers(TeacherSearchRequestDto request){
+    /*
+
+    public List<Member> allTeachers(TeacherSearchRequestDto request) {
 
         String type = request.getType();
         String name = request.getName();
@@ -35,5 +35,6 @@ public class TeacherService {
 
         QMember qMember = QMember.member;
         QSubject qSubject = QSubject.subject;
-
+    }
+    */
 }
