@@ -2,7 +2,7 @@ package com.example.godtudy.domain.member.entity;
 
 import com.example.godtudy.domain.BaseEntity;
 import com.example.godtudy.domain.member.dto.request.profile.ProfileRequestDto;
-import com.example.godtudy.domain.post.entity.Notice;
+import com.example.godtudy.domain.post.entity.AdminPost;
 import lombok.*;
 import lombok.extern.slf4j.Slf4j;
 
@@ -58,7 +58,7 @@ public class Member extends BaseEntity {
     private List<Subject> subject = new ArrayList<>();
 
     @OneToMany(mappedBy = "member")
-    private List<Notice> notices = new ArrayList<>();
+    private List<AdminPost> adminPosts = new ArrayList<>();
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
@@ -73,10 +73,10 @@ public class Member extends BaseEntity {
         }
     }
 
-    public void addNotice(Notice notice) {
-        this.notices.add(notice);
-        if (notice.getAuthor() != this) {
-            notice.setAuthor(this);
+    public void addNotice(AdminPost adminPost) {
+        this.adminPosts.add(adminPost);
+        if (adminPost.getAuthor() != this) {
+            adminPost.setAuthor(this);
         }
     }
     // ==        == //

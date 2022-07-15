@@ -15,7 +15,7 @@ import javax.persistence.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class Notice extends BaseEntity {
+public class AdminPost extends BaseEntity {
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -37,17 +37,17 @@ public class Notice extends BaseEntity {
 
     public void setAuthor(Member author) {
         if (this.author != null) {
-            this.author.getNotices().remove(this);
+            this.author.getAdminPosts().remove(this);
         }
         this.author = author;
-        author.getNotices().add(this);
+        author.getAdminPosts().add(this);
     }
 
-    public static Notice createMemberNotice(Member member) {
-        Notice notice = new Notice();
-        notice.setAuthor(member);
-        member.addNotice(notice);
-        return notice;
+    public static AdminPost createMemberNotice(Member member) {
+        AdminPost adminPost = new AdminPost();
+        adminPost.setAuthor(member);
+        member.addNotice(adminPost);
+        return adminPost;
     }
 
 }

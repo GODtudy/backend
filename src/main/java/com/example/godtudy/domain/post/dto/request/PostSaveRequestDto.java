@@ -1,6 +1,6 @@
 package com.example.godtudy.domain.post.dto.request;
 
-import com.example.godtudy.domain.post.entity.Notice;
+import com.example.godtudy.domain.post.entity.AdminPost;
 import com.example.godtudy.global.validation.ValidationGroups;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -28,8 +28,8 @@ public class PostSaveRequestDto {
 
     private LocalDateTime modifiedDate;
 
-    public Notice toNoticeEntity(){
-        return Notice.builder()
+    public AdminPost toNoticeEntity(){
+        return AdminPost.builder()
                 .title(title)
                 .content(content)
                 .image(image)
