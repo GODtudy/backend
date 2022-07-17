@@ -73,13 +73,12 @@ public class Member extends BaseEntity {
         }
     }
 
-    public void addNotice(AdminPost adminPost) {
+    public void addAdminPost(AdminPost adminPost) {
         this.adminPosts.add(adminPost);
-        if (adminPost.getAuthor() != this) {
+        if (adminPost.getMember() != this) {
             adminPost.setAuthor(this);
         }
     }
-    // ==        == //
 
     public void setRole(Role role) {
         this.role = role;

@@ -22,7 +22,7 @@ public class PostSaveRequestDto {
     @NotBlank(message = "내용을 입력해주세요..", groups = ValidationGroups.NotEmptyGroup.class)
     private String content;
 
-    private String image;
+    private String file;
 
     private LocalDateTime createdDate;
 
@@ -32,7 +32,7 @@ public class PostSaveRequestDto {
         return AdminPost.builder()
                 .title(title)
                 .content(content)
-                .image(image)
+                .file(file)
                 .build();
     }
 }
