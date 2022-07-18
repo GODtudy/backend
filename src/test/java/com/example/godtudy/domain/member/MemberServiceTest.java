@@ -199,5 +199,15 @@ class MemberServiceTest {
         assertThat(memberNotFoundException.getMessage()).isEqualTo("존재하지 않는 회원정보입니다.");
     }
 
-
+//    @WithMember("test123")
+//    @Test
+//    public void nplus1_problem_check() throws Exception{
+//        System.out.println("------------------------------------------");
+//        System.out.println("------------------------------------------");
+//        System.out.println("------------------------------------------");
+//        memberRepository.findByUsername("test123").orElseThrow();
+//        System.out.println("------------------------------------------");
+//        System.out.println("------------------------------------------");
+//        System.out.println("------------------------------------------");
+//    }
 }

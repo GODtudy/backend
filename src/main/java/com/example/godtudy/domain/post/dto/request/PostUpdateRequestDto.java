@@ -16,7 +16,4 @@ public class PostUpdateRequestDto {
     private String content;
 
     private String file;
-
-    private String modifiedDate;
-
 }

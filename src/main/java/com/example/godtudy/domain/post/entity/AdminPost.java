@@ -3,6 +3,7 @@ package com.example.godtudy.domain.post.entity;
 import com.example.godtudy.domain.BaseEntity;
 import com.example.godtudy.domain.member.entity.Member;
 import com.example.godtudy.domain.post.dto.request.PostSaveRequestDto;
+import com.example.godtudy.domain.post.dto.request.PostUpdateRequestDto;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -46,10 +47,9 @@ public class AdminPost extends BaseEntity {
         author.getAdminPosts().add(this);
     }
 
-    public void updateAdminPost(PostSaveRequestDto postSaveRequestDto) {
-        this.title = postSaveRequestDto.getTitle();
-        this.content = postSaveRequestDto.getContent();
-        this.file = postSaveRequestDto.getFile();
-        this.modifiedDate = postSaveRequestDto.getModifiedDate();
+    public void updateAdminPost(PostUpdateRequestDto postUpdateRequestDto) {
+        this.title = postUpdateRequestDto.getTitle();
+        this.content = postUpdateRequestDto.getContent();
+//        this.file = postUpdateRequestDto.getFile();
     }
 }

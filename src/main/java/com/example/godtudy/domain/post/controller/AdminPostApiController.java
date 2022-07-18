@@ -25,11 +25,13 @@ public class AdminPostApiController {
     }
 
     @PostMapping("/{post}/{id}")
-    public ResponseEntity<?> updateNoticeEvent(@PathVariable String post, @PathVariable String id, @CurrentMember Member member,
+    public ResponseEntity<?> updateNoticeEvent(@PathVariable String post, @PathVariable Long id, @CurrentMember Member member,
                                                @RequestBody PostUpdateRequestDto postUpdateRequestDto) {
-        return adminPostService.updateAdminPost(member, postUpdateRequestDto);
+        return adminPostService.updateAdminPost(member, id , postUpdateRequestDto);
     }
 
-
-
+    @DeleteMapping("/{post}/{id}")
+    public ResponseEntity<?> deleteNoticeEvent(@PathVariable String post, @PathVariable Long id, @CurrentMember Member member) {
+        return adminPostService.deleteAdminPost(member, id);
+    }
 }
