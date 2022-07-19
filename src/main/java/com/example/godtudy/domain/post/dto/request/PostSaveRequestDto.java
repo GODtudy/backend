@@ -6,9 +6,12 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.validation.constraints.NotBlank;
 import java.time.LocalDateTime;
+
+import java.util.Optional;
 
 @Data
 @NoArgsConstructor
@@ -22,7 +25,8 @@ public class PostSaveRequestDto {
     @NotBlank(message = "내용을 입력해주세요..", groups = ValidationGroups.NotEmptyGroup.class)
     private String content;
 
-    private String file;
+//    private List<String> files;
+    private Optional<MultipartFile> file;
 
     private LocalDateTime createdDate;
 
@@ -32,7 +36,6 @@ public class PostSaveRequestDto {
         return AdminPost.builder()
                 .title(title)
                 .content(content)
-                .file(file)
                 .build();
     }
 }

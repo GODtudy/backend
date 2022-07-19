@@ -18,7 +18,7 @@ public class OpenEntityManagerConfig {
         return filterFilterRegistrationBean;
     }
 
-//    https://tecoble.techcourse.co.kr/post/2020-08-31-entity-lifecycle-1/
-//    https://tecoble.techcourse.co.kr/post/2020-09-20-entity-lifecycle-2/
 }
 
+//    https://tecoble.techcourse.co.kr/post/2020-08-31-entity-lifecycle-1/
+//    https://tecoble.techcourse.co.kr/post/2020-09-20-entity-lifecycle-2/

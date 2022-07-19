@@ -4,6 +4,9 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.util.Optional;
 
 @Data
 @NoArgsConstructor
@@ -15,5 +18,5 @@ public class PostUpdateRequestDto {
 
     private String content;
 
-    private String file;
+    private Optional<MultipartFile> file;
 }
