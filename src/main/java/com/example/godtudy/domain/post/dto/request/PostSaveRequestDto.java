@@ -11,6 +11,7 @@ import org.springframework.web.multipart.MultipartFile;
 import javax.validation.constraints.NotBlank;
 import java.time.LocalDateTime;
 
+import java.util.List;
 import java.util.Optional;
 
 @Data
@@ -24,9 +25,6 @@ public class PostSaveRequestDto {
 
     @NotBlank(message = "내용을 입력해주세요..", groups = ValidationGroups.NotEmptyGroup.class)
     private String content;
-
-//    private List<String> files;
-    private Optional<MultipartFile> file;
 
     private LocalDateTime createdDate;
 

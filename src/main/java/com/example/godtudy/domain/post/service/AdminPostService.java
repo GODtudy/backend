@@ -16,6 +16,9 @@ import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.util.List;
 
 @Slf4j
 @Service
@@ -31,7 +34,8 @@ public class AdminPostService {
     /**
      * 게시물 등록
      */
-    public ResponseEntity<?> createAdminPost(Member member, String post, PostSaveRequestDto postSaveRequestDto) {
+    public ResponseEntity<?> createAdminPost(Member member, List<MultipartFile> file,
+                                             String post, PostSaveRequestDto postSaveRequestDto) {
         checkIfAdmin(member); //관리자인지 확인
 
         AdminPost adminPost = postSaveRequestDto.toNoticeEntity();
@@ -39,9 +43,9 @@ public class AdminPostService {
         adminPost.setAdminPostEnum(post); // 현재 게시판 작성
         member.addAdminPost(adminPost);
         //file 저장
-        postSaveRequestDto.getFile().ifPresent(
-                file -> adminPost.updateFile(fileService.save(file))
-        );
+        for (MultipartFile files : file) {
+            adminPost.updateFile(fileService.save(files));
+        }
 
         adminPostRepository.save(adminPost);
 
@@ -51,7 +55,8 @@ public class AdminPostService {
     /**
      * 게시물 수정
      */
-    public ResponseEntity<?> updateAdminPost(Member member,Long id, PostUpdateRequestDto postUpdateRequestDto) {
+    public ResponseEntity<?> updateAdminPost(Member member,List<MultipartFile> file,
+                                             Long id, PostUpdateRequestDto postUpdateRequestDto) {
         AdminPost adminPost = adminPostRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("해당 게시물이 존재하지 않습니다."));
         checkIfAdmin(member);
@@ -60,9 +65,9 @@ public class AdminPostService {
         adminPost.updateAdminPost(postUpdateRequestDto);
 
         //file 저장
-        postUpdateRequestDto.getFile().ifPresent(
-                file -> adminPost.updateFile(fileService.save(file))
-        );
+        for (MultipartFile files : file) {
+            adminPost.updateFile(fileService.save(files));
+        }
 
         return new ResponseEntity<>("Notice Update", HttpStatus.OK);
     }

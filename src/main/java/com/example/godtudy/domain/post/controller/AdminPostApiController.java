@@ -9,6 +9,9 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.util.List;
 
 @Slf4j
 @RestController
@@ -20,14 +23,16 @@ public class AdminPostApiController {
 
     @PostMapping("{post}/new")
     public ResponseEntity<?> createNoticeEvent(@PathVariable String post ,@CurrentMember Member member,
-                                               @RequestBody PostSaveRequestDto postSaveRequestDto) {
-        return adminPostService.createAdminPost(member, post, postSaveRequestDto);
+                                               @RequestBody PostSaveRequestDto postSaveRequestDto,
+                                               @RequestPart List<MultipartFile> file) {
+        return adminPostService.createAdminPost(member,file, post, postSaveRequestDto);
     }
 
     @PostMapping("/{post}/{id}")
     public ResponseEntity<?> updateNoticeEvent(@PathVariable String post, @PathVariable Long id, @CurrentMember Member member,
-                                               @RequestBody PostUpdateRequestDto postUpdateRequestDto) {
-        return adminPostService.updateAdminPost(member, id , postUpdateRequestDto);
+                                               @RequestBody PostUpdateRequestDto postUpdateRequestDto,
+                                               @RequestPart List<MultipartFile> file) {
+        return adminPostService.updateAdminPost(member,file, id , postUpdateRequestDto);
     }
 
     @DeleteMapping("/{post}/{id}")
