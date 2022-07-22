@@ -9,6 +9,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.List;
 import java.util.UUID;
 
 @Service
@@ -19,7 +20,7 @@ public class FileService {
 
     public String save(MultipartFile multipartFile) {
 
-        String filePath = fileDir + UUID.randomUUID();
+        String filePath = fileDir + UUID.randomUUID() + multipartFile.getOriginalFilename();
         try {
             multipartFile.transferTo(new File(filePath));
         } catch (IOException e) {
@@ -27,6 +28,20 @@ public class FileService {
         }
 
         return filePath;
+    }
+
+    public String save(List<MultipartFile> multipartFiles) throws IOException {
+        for (MultipartFile file : multipartFiles) {
+            String originName = file.getOriginalFilename();
+            String filePath = fileDir + UUID.randomUUID() + originName;
+
+            File dest = new File(filePath);
+            file.transferTo(dest);
+        }
+
+        return "uploading";
+
+
     }
 
     public void delete(String filePath) {

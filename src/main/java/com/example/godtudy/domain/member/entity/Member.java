@@ -58,7 +58,7 @@ public class Member extends BaseEntity {
     private List<Subject> subject = new ArrayList<>();
 
     @OneToMany(mappedBy = "member")
-    private List<AdminPost> adminPosts = new ArrayList<>();
+    private List<AdminPost> adminPosts = new ArrayList<>(); // NullpointerException 7.5 커밋내용 보기
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
@@ -86,8 +86,7 @@ public class Member extends BaseEntity {
 
     // 이메일 체크 토근 랜덤한 값 생성
     public void generateEmailCheckToken() {
-        this.emailCheckToken = UUID.
-                randomUUID().toString();
+        this.emailCheckToken = UUID.randomUUID().toString();
         this.emailCheckTokenGeneratedAt = LocalDateTime.now();
     }
 

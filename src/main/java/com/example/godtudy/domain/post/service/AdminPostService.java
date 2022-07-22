@@ -10,6 +10,8 @@ import com.example.godtudy.domain.post.repository.AdminPostRepository;
 import com.example.godtudy.global.file.service.FileService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.coyote.Response;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
@@ -18,13 +20,18 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.File;
 import java.util.List;
+import java.util.UUID;
 
 @Slf4j
 @Service
 @Transactional
 @RequiredArgsConstructor
 public class AdminPostService {
+
+    @Value("${spring.servlet.multipart.location}")
+    private String fileDir;
 
     private final AdminPostRepository adminPostRepository;
     private final MemberRepository memberRepository;
@@ -34,23 +41,40 @@ public class AdminPostService {
     /**
      * 게시물 등록
      */
-    public ResponseEntity<?> createAdminPost(Member member, List<MultipartFile> file,
-                                             String post, PostSaveRequestDto postSaveRequestDto) {
-        checkIfAdmin(member); //관리자인지 확인
 
+    private AdminPost adminPost(Member member, String post, PostSaveRequestDto postSaveRequestDto) {
+        checkIfAdmin(member); //관리자인지 확인
         AdminPost adminPost = postSaveRequestDto.toNoticeEntity();
         adminPost.setAuthor(member); // 현재 맴버 매핑
         adminPost.setAdminPostEnum(post); // 현재 게시판 작성
         member.addAdminPost(adminPost);
+
+        return adminPost;
+    }
+
+    public ResponseEntity<?> createAdminPost(Member member, String post, PostSaveRequestDto postSaveRequestDto) {
+        AdminPost adminPost = adminPost(member, post, postSaveRequestDto);
+        adminPostRepository.save(adminPost);
+
+        return new ResponseEntity<>("Notice Create", HttpStatus.OK);
+    }
+
+    public ResponseEntity<?> createAdminPost(Member member, List<MultipartFile> files,
+                                             String post, PostSaveRequestDto postSaveRequestDto) {
+        AdminPost adminPost = adminPost(member, post, postSaveRequestDto);
         //file 저장
-        for (MultipartFile files : file) {
-            adminPost.updateFile(fileService.save(files));
-        }
+        fileService.save(files);
+
+//        for (MultipartFile file : files) {
+//            fileService.save(file);
+//            adminPost.updateFile(fileService.save(file));
+//        }
 
         adminPostRepository.save(adminPost);
 
         return new ResponseEntity<>("Notice Create", HttpStatus.OK);
     }
+
 
     /**
      * 게시물 수정

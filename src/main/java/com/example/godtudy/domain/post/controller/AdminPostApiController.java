@@ -20,19 +20,29 @@ import java.util.List;
 public class AdminPostApiController {
 
     private final AdminPostService adminPostService;
+//
+//    @PostMapping("{post}/new")
+//    public ResponseEntity<?> createNoticeEvent(@PathVariable String post ,@CurrentMember Member member,
+//                                               @RequestBody PostSaveRequestDto postSaveRequestDto) {
+//
+//        return adminPostService.createAdminPost(member, post, postSaveRequestDto);
+//    }
 
     @PostMapping("{post}/new")
     public ResponseEntity<?> createNoticeEvent(@PathVariable String post ,@CurrentMember Member member,
                                                @RequestBody PostSaveRequestDto postSaveRequestDto,
-                                               @RequestPart List<MultipartFile> file) {
-        return adminPostService.createAdminPost(member,file, post, postSaveRequestDto);
+                                               @RequestPart List<MultipartFile> files) {
+        if (files.isEmpty()) {
+            return adminPostService.createAdminPost(member, post, postSaveRequestDto);
+        }
+        return adminPostService.createAdminPost(member,files, post, postSaveRequestDto);
     }
 
     @PostMapping("/{post}/{id}")
     public ResponseEntity<?> updateNoticeEvent(@PathVariable String post, @PathVariable Long id, @CurrentMember Member member,
                                                @RequestBody PostUpdateRequestDto postUpdateRequestDto,
-                                               @RequestPart List<MultipartFile> file) {
-        return adminPostService.updateAdminPost(member,file, id , postUpdateRequestDto);
+                                               @RequestPart List<MultipartFile> files) {
+        return adminPostService.updateAdminPost(member,files, id , postUpdateRequestDto);
     }
 
     @DeleteMapping("/{post}/{id}")

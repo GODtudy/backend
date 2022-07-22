@@ -26,10 +26,6 @@ public class PostSaveRequestDto {
     @NotBlank(message = "내용을 입력해주세요..", groups = ValidationGroups.NotEmptyGroup.class)
     private String content;
 
-    private LocalDateTime createdDate;
-
-    private LocalDateTime modifiedDate;
-
     public AdminPost toNoticeEntity(){
         return AdminPost.builder()
                 .title(title)

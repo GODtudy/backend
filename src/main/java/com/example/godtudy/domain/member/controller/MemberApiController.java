@@ -60,7 +60,7 @@ public class MemberApiController {
         if (errors.hasErrors()) {
             return new ResponseEntity<>(errors.getAllErrors(), HttpStatus.BAD_REQUEST);
         }
-        Member member = memberService.initJoinMember(memberJoinForm, role);
+        Member member = memberService.initJoinMember(memberJoinForm, role.toUpperCase());
 
         memberService.sendJoinConfirmEmail(member);
 

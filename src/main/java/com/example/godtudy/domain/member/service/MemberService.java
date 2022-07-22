@@ -102,7 +102,10 @@ public class MemberService {
 
     /*  회원가입  */
     public Member initJoinMember(MemberJoinForm memberJoinForm, String role) {
-        String tmpRole = "TMP_" + role.toUpperCase();
+        String tmpRole = "";
+        if (!role.equals("ADMIN")){ tmpRole = "TMP_" + role.toUpperCase();}
+        else{ tmpRole = role.toUpperCase(); }
+
 
         //TODO 회원가입하고 이메일인증을 하지 않았을 때 같은 이메일로 회원가입이 들어오면 어떻게 해야할가를 생각
         memberJoinForm.setPassword(passwordEncoder.encode(memberJoinForm.getPassword()));
